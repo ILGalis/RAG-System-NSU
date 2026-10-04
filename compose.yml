@@ -1,0 +1,28 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: nsu-rag-postgres
+    environment:
+      POSTGRES_BD: nsu_rag
+      POSTGRES_USER: nsu_rag
+      POSTGRES_PASSWORD: local_dev_password
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    mem_limit: 512m
+
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: nsu-rag-qdrant
+    ports:
+      - "127.0.0.1:6333:6333"
+    volumes:
+      - qdrant_data:/qdrant/storage
+    restart: unless-stopped
+    mem_limit: 768m
+
+volumes:
+  postgres_data:
+  qdrant_data:

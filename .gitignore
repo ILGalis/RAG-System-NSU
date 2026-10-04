@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv
+
+# Secrets and local environment
+.env
+.env.*
+!.env.example
+
+#Local documents and data
+storage/*
+!storage/.gitkeep
+
+#Test and tooling cache
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+#macOS and editors
+.DS_store
+.vscode/
