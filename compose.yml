@@ -3,7 +3,7 @@ services:
     image: postgres:16
     container_name: nsu-rag-postgres
     environment:
-      POSTGRES_BD: nsu_rag
+      POSTGRES_DB: nsu_rag
       POSTGRES_USER: nsu_rag
       POSTGRES_PASSWORD: local_dev_password
     ports:

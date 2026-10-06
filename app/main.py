@@ -16,4 +16,4 @@ def health_check():
 def database_health_check():
     with engine.connect() as connection:
         connection.execute(text("SELECT 1"))
-    return {"status": "ok","databse": "postgresql"}
+    return {"status": "ok","database": "postgresql"}
