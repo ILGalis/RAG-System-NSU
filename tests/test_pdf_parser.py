@@ -42,3 +42,44 @@ def test_pdf_parser_rejects_non_pdf_file(tmp_path):
 
     with pytest.raises(ValueError, match="Expected a PDF file"):
         PDFParser().parse(txt_file)
+
+
+import pymupdf
+
+
+
+def test_pdf_preserves_russian_text_and_page_structure(tmp_path):
+    """Russian text and page boundaries should be preserved."""
+    file_path = tmp_path / "russian.pdf"
+    font_path = "/System/Library/Fonts/Supplemental/Arial.ttf"
+
+    with pymupdf.open() as pdf:
+        first_page = pdf.new_page()
+        first_page.insert_font(fontname="Arial", fontfile=font_path)
+        first_page.insert_text(
+            (72, 72),
+            "Привет, студент!",
+            fontname="Arial",
+        )
+
+        second_page = pdf.new_page()
+        second_page.insert_font(fontname="Arial", fontfile=font_path)
+        second_page.insert_text(
+            (72, 72),
+            "Вторая страница",
+            fontname="Arial",
+        )
+
+        pdf.save(file_path)
+
+    parser = PDFParser()
+    result = parser.parse(file_path)
+
+    assert len(result.pages) == 2
+    assert [page.page_number for page in result.pages] == [1, 2]
+    assert " ".join(result.pages[0].text.split()) == "Привет, студент!"
+    assert " ".join(result.pages[1].text.split()) == "Вторая страница"
+    assert result.metadata["page_count"] == "2"
+    assert result.text == "\n\n".join(
+        page.text for page in result.pages if page.text
+    )

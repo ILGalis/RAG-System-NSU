@@ -43,3 +43,17 @@ def test_txt_parser_rejects_non_txt_file(tmp_path):
 
     with pytest.raises(ValueError, match="Expected a TXT file"):
         TXTParser().parse(pdf_file)
+
+
+def test_empty_txt_returns_empty_text(tmp_path):
+    """An empty TXT file should be parsed without errors."""
+    file_path = tmp_path / "empty.txt"
+    file_path.write_text("", encoding="utf-8")
+
+    parser = TXTParser()
+    result = parser.parse(file_path)
+
+    assert result.text == ""
+    assert result.source_name == "empty.txt"
+    assert result.file_type == "txt"
+    assert result.metadata["encoding"] == "utf-8-sig"
