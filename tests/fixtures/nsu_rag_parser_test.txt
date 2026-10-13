@@ -1,0 +1,3 @@
+NSU RAG TXT parser test.
+Привет, мир
+This text should be extracted.
