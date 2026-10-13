@@ -1,13 +1,15 @@
 import pytest
-from sqlalchemy import select 
+from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.db.connection import engine
-from app.db.models import User
+from app.models import User
+
 
 def test_user_creation_and_unique_email():
     test_email = "student-test@example.com"
+    test_password_hash = "$argon2id$v=19$m=65536,t=3,p=4$fakehashfor test"
 
     with Session(engine) as session:
         user = session.scalar(
@@ -17,7 +19,7 @@ def test_user_creation_and_unique_email():
         if user is None:
             user = User(
                 email=test_email,
-                password_hash=None,
+                password_hash=test_password_hash,
                 role="student",
                 is_email_verified=False,
             )
@@ -30,7 +32,7 @@ def test_user_creation_and_unique_email():
 
         duplicate = User(
             email=test_email,
-            password_hash=None,
+            password_hash=test_password_hash,
             role="student",
             is_email_verified=False,
         )
