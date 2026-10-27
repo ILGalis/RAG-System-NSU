@@ -3,8 +3,8 @@ from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
-from app.db.connection import engine
-from app.models import User
+from backend.db.connection import engine
+from backend.models import User
 
 
 def test_user_creation_and_unique_email():

@@ -9,19 +9,17 @@ from alembic import context
 
 sys.path.append(str(Path(__file__).resolve().parents[1]))
 
-from app.db.base import Base
-from app.models import RagSpace, SpaceMember, User  # noqa: F401
+from backend.db.base import Base
+from backend.models import RagSpace, SpaceMember, User  # noqa: F401
 
 config = context.config
 
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-database_url = os.getenv(
-    "DATABASE_URL",
-    "postgresql+psycopg2://nsu:nsu_pass@localhost:5432/nsu_rag",
-)
-config.set_main_option("sqlalchemy.url", database_url)
+from backend.core.config import settings
+
+config.set_main_option("sqlalchemy.url", settings.database_url)
 
 target_metadata = Base.metadata
 
