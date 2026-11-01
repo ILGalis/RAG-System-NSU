@@ -7,10 +7,18 @@ from sqlalchemy import engine_from_config, pool
 
 from alembic import context
 
+from backend.models import (
+    EmailVerificationToken,
+    RagSpace,
+    SpaceMember,
+    User,
+    UserSession,
+)
+
 sys.path.append(str(Path(__file__).resolve().parents[1]))
 
 from backend.db.base import Base
-from backend.models import RagSpace, SpaceMember, User  # noqa: F401
+from backend.models import RagSpace, SpaceMember, User 
 
 config = context.config
 

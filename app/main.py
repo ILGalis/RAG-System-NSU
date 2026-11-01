@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from sqlalchemy import text
 
-from app.api.routes import spaces
+from app.api.routes import auth, spaces
 from app.core.error import register_error_handlers
 from backend.db.connection import engine
 
@@ -13,7 +13,7 @@ app = FastAPI(
 register_error_handlers(app)
 
 app.include_router(spaces.router)
-
+app.include_router(auth.router)
 
 @app.get("/health")
 def health_check():
