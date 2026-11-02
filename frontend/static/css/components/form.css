@@ -1,0 +1,338 @@
+.auth-page {
+    min-height: 100vh;
+
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
+
+
+/* Левая часть */
+
+.auth-info {
+    position: relative;
+
+    padding: 48px 60px;
+
+    display: flex;
+    flex-direction: column;
+
+    overflow: hidden;
+
+    background:
+        radial-gradient(
+            circle at 5% 100%,
+            rgba(79, 174, 47, 0.09),
+            transparent 54%
+        ),
+        var(--color-info-background);
+}
+
+
+/* SVG-паттерн */
+
+.auth-info::after {
+    content: "";
+
+    position: absolute;
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    background-image: url("../../img/nsu-pattern.svg");
+    background-repeat: no-repeat;
+    background-position: left bottom;
+    background-size: 118% auto;
+
+    -webkit-mask-image: linear-gradient(
+        to bottom,
+        transparent 20%,
+        rgba(0, 0, 0, 0.15) 32%,
+        black 48%
+    );
+
+    mask-image: linear-gradient(
+        to bottom,
+        transparent 20%,
+        rgba(0, 0, 0, 0.15) 32%,
+        black 48%
+    );
+
+    pointer-events: none;
+    z-index: 1;
+}
+
+
+.auth-logo {
+    position: relative;
+
+    z-index: 2;
+
+    display: flex;
+    align-items: center;
+
+    gap: 12px;
+
+    font-size: 20px;
+    font-weight: 700;
+}
+
+
+.logo-icon {
+    width: 24px;
+    height: 24px;
+
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+
+    gap: 3px;
+}
+
+
+.logo-icon span {
+    display: block;
+
+    background: var(--color-primary);
+
+    border-radius: 3px;
+}
+
+
+.auth-info-content {
+    position: relative;
+
+    z-index: 2;
+
+    margin-top: 80px;
+
+    max-width: 470px;
+}
+
+
+.auth-info-content h1 {
+    margin: 0 0 22px;
+
+    font-size: 34px;
+    line-height: 1.25;
+}
+
+
+.auth-info-content p {
+    margin: 0;
+
+    color: var(--color-text-secondary);
+
+    font-size: 16px;
+    line-height: 1.7;
+}
+
+
+/* Правая часть */
+
+.auth-form-section {
+    padding: 40px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
+.auth-form-container {
+    width: 100%;
+    max-width: 430px;
+}
+
+
+.auth-form-container h2 {
+    margin: 0 0 10px;
+
+    font-size: 30px;
+}
+
+
+.auth-description {
+    margin: 0 0 30px;
+
+    color: var(--color-text-secondary);
+
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+
+/* Форма */
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+
+    gap: 18px;
+}
+
+
+.form-field {
+    display: flex;
+    flex-direction: column;
+
+    gap: 8px;
+}
+
+
+.form-field label {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+
+.form-field input {
+    width: 100%;
+
+    padding: 13px 14px;
+
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+
+    background: #ffffff;
+
+    color: var(--color-text);
+
+    outline: none;
+
+    transition:
+        border-color 0.2s,
+        box-shadow 0.2s;
+}
+
+
+.form-field input::placeholder {
+    color: #9aa8b8;
+}
+
+
+.form-field input:focus {
+    border-color: var(--color-primary);
+
+    box-shadow:
+        0 0 0 3px rgba(79, 174, 47, 0.12);
+}
+
+
+/* Ошибка */
+
+.form-error {
+    margin: 0;
+
+    color: var(--color-error);
+
+    font-size: 13px;
+}
+
+
+.form-error:empty {
+    display: none;
+}
+
+
+/* Основная кнопка */
+
+.auth-button {
+    width: 100%;
+
+    padding: 14px;
+
+    border: 0;
+    border-radius: var(--radius-md);
+
+    background: var(--color-primary);
+
+    color: #ffffff;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s,
+        transform 0.15s;
+}
+
+
+.auth-button:hover {
+    background: var(--color-primary-hover);
+}
+
+
+.auth-button:active {
+    transform: translateY(1px);
+}
+
+
+/* Информационный блок */
+
+.auth-notice {
+    margin-top: 34px;
+
+    padding: 14px 16px;
+
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+
+    background: var(--color-primary-light);
+
+    color: #566b51;
+
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+
+/* Переключатель входа и регистрации */
+
+.auth-switcher {
+    margin-bottom: 34px;
+
+    padding: 4px;
+
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+
+    background: var(--color-primary-light);
+
+    border-radius: 10px;
+}
+
+
+.auth-switcher-item {
+    padding: 11px 16px;
+
+    border-radius: 7px;
+
+    color: var(--color-text-secondary);
+
+    font-size: 14px;
+    font-weight: 600;
+
+    text-align: center;
+    text-decoration: none;
+
+    transition:
+        background 0.2s,
+        color 0.2s,
+        box-shadow 0.2s;
+}
+
+
+.auth-switcher-item:hover {
+    color: var(--color-primary);
+}
+
+
+.auth-switcher-item.active {
+    background: #ffffff;
+
+    color: var(--color-primary);
+
+    box-shadow:
+        0 1px 4px rgba(67, 66, 66, 0.12);
+}

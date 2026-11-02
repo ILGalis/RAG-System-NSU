@@ -1,0 +1,132 @@
+.course-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px;
+}
+
+.course-card {
+    position: relative;
+
+    min-height: 180px;
+    padding: 22px;
+
+    display: flex;
+    flex-direction: column;
+
+    background: #ffffff;
+
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+
+    transition:
+        border-color 0.2s,
+        box-shadow 0.2s,
+        transform 0.2s;
+}
+
+.course-card:hover {
+    border-color: var(--color-primary);
+
+    box-shadow: 0 8px 24px rgba(63, 63, 63, 0.08);
+
+    transform: translateY(-2px);
+}
+
+.course-card-link {
+    position: absolute;
+    inset: 0;
+
+    border-radius: var(--radius-lg);
+}
+
+.course-card h2 {
+    position: relative;
+    z-index: 1;
+
+    margin: 0 0 10px;
+
+    font-size: 18px;
+
+    pointer-events: none;
+}
+
+.course-card-description {
+    position: relative;
+    z-index: 1;
+
+    margin: 0;
+
+    color: var(--color-text-secondary);
+
+    font-size: 14px;
+    line-height: 1.5;
+
+    pointer-events: none;
+}
+
+.course-card-actions {
+    position: relative;
+    z-index: 2;
+
+    margin-top: auto;
+    padding-top: 20px;
+}
+
+.course-add-button {
+    padding: 9px 14px;
+
+    border: 1px solid var(--color-primary);
+    border-radius: var(--radius-md);
+
+    background: #ffffff;
+    color: var(--color-primary);
+
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+.course-add-button:hover {
+    background: var(--color-primary);
+    color: #ffffff;
+}
+
+/* My Courses tabs */
+
+.course-tabs {
+    display: flex;
+    gap: 8px;
+
+    margin-bottom: 26px;
+}
+
+.course-tab {
+    padding: 10px 18px;
+
+    border: 0;
+    border-radius: var(--radius-md);
+
+    background: transparent;
+    color: var(--color-text-secondary);
+
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+.course-tab:hover {
+    background: var(--color-primary-light);
+}
+
+.course-tab.active {
+    background: var(--color-primary-light);
+    color: var(--color-primary);
+}
+
+.course-tab-content {
+    display: none;
+}
+
+.course-tab-content.active {
+    display: grid;
+}

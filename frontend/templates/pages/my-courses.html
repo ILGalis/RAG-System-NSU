@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Мои курсы — NSU RAG</title>
+
+    <link rel="stylesheet" href="/static/css/tokens.css">
+    <link rel="stylesheet" href="/static/css/base.css">
+    <link rel="stylesheet" href="/static/css/layout.css">
+    <link rel="stylesheet" href="/static/css/components/card.css">
+</head>
+
+<body>
+
+<div class="app-layout">
+
+    <aside class="sidebar">
+
+        <div class="sidebar-logo">
+            NSU RAG
+        </div>
+
+        <nav class="sidebar-nav">
+
+            <a
+                href="courses.html"
+                class="sidebar-link"
+            >
+                Все курсы
+            </a>
+
+            <a
+                href="my-courses.html"
+                class="sidebar-link active"
+            >
+                Мои курсы
+            </a>
+
+            <a
+                href="profile.html"
+                class="sidebar-link"
+            >
+                Профиль
+            </a>
+
+        </nav>
+
+    </aside>
+
+
+    <main class="app-content">
+
+        <header class="page-header">
+            <h1>Мои курсы</h1>
+
+            <p>
+                Курсы, которыми вы владеете или в которых состоите
+            </p>
+        </header>
+
+
+        <div class="course-tabs">
+
+            <button
+                class="course-tab active"
+                data-tab="owned"
+            >
+                Владею
+            </button>
+
+            <button
+                class="course-tab"
+                data-tab="joined"
+            >
+                Состою
+            </button>
+
+        </div>
+
+
+        <section
+            id="owned"
+            class="course-grid course-tab-content active"
+        >
+
+            <article class="course-card">
+
+                <a
+                    href="course/chat.html"
+                    class="course-card-link"
+                    aria-label="Открыть курс"
+                ></a>
+
+                <h2>Курс 1</h2>
+
+                <p class="course-card-description">
+                    Вы владелец этого курса
+                </p>
+
+            </article>
+
+        </section>
+
+
+        <section
+            id="joined"
+            class="course-grid course-tab-content"
+        >
+
+            <article class="course-card">
+
+                <a
+                    href="course/chat.html"
+                    class="course-card-link"
+                    aria-label="Открыть курс"
+                ></a>
+
+                <h2>Курс 2</h2>
+
+                <p class="course-card-description">
+                    Вы участник этого курса
+                </p>
+
+            </article>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<script>
+    const tabs = document.querySelectorAll(".course-tab");
+    const contents = document.querySelectorAll(".course-tab-content");
+
+    tabs.forEach(tab => {
+        tab.addEventListener("click", () => {
+
+            tabs.forEach(item => {
+                item.classList.remove("active");
+            });
+
+            contents.forEach(content => {
+                content.classList.remove("active");
+            });
+
+            tab.classList.add("active");
+
+            document
+                .getElementById(tab.dataset.tab)
+                .classList.add("active");
+        });
+    });
+</script>
+
+</body>
+</html>
