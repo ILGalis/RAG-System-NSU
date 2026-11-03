@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Вход — NSU RAG</title>
+
+    <link rel="stylesheet" href="/static/css/tokens.css">
+    <link rel="stylesheet" href="/static/css/base.css">
+    <link rel="stylesheet" href="/static/css/components/form.css">
+
+    <script src="/static/js/auth.js" defer></script>
+</head>
+
+<body>
+    <main class="auth-page">
+
+        <section class="auth-info">
+
+            <div class="auth-logo">
+                <div class="logo-icon">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+
+                <span>NSU RAG</span>
+            </div>
+
+            <div class="auth-info-content">
+                <h1>
+                    Учебные материалы<br>
+                    и AI-помощник в одном месте
+                </h1>
+
+                <p>
+                    Получайте точные ответы на основе материалов
+                    ваших курсов. Загружайте документы, задавайте
+                    вопросы и учитесь эффективнее.
+                </p>
+            </div>
+
+        </section>
+
+
+        <section class="auth-form-section">
+
+            <div class="auth-form-container">
+
+                <nav class="auth-switcher">
+
+                    <a
+                        href="login.html"
+                        class="auth-switcher-item active"
+                    >
+                        Вход
+                    </a>
+
+                    <a
+                        href="register.html"
+                        class="auth-switcher-item"
+                    >
+                        Регистрация
+                    </a>
+
+                </nav>
+
+
+                <h2>Вход в систему</h2>
+
+                <p class="auth-description">
+                    Введите данные вашей учётной записи NSU RAG.
+                </p>
+
+
+                <form id="login-form" class="auth-form">
+
+                    <div class="form-field">
+                        <label for="email">Почта</label>
+
+                        <input
+                            id="email"
+                            name="email"
+                            type="email"
+                            placeholder="you@g.nsu.ru"
+                            autocomplete="email"
+                            required
+                        >
+                    </div>
+
+
+                    <div class="form-field">
+                        <label for="password">Пароль</label>
+
+                        <input
+                            id="password"
+                            name="password"
+                            type="password"
+                            placeholder="Введите пароль"
+                            autocomplete="current-password"
+                            required
+                        >
+                    </div>
+
+
+                    <p
+                        id="form-error"
+                        class="form-error"
+                        role="alert"
+                    ></p>
+
+
+                    <button
+                        class="auth-button"
+                        type="submit"
+                    >
+                        Войти
+                    </button>
+
+                </form>
+
+
+                <div class="auth-notice">
+                    Доступ к системе имеют студенты и преподаватели НГУ.
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+</body>
+</html>
