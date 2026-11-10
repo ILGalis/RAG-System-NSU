@@ -65,7 +65,7 @@ def register(data: RegisterRequest, db: Session = Depends(get_db)) -> dict:
     db.add(user)
     db.flush()
 
-    raw_token = secrets.token_urlsafe(32)
+    raw_token = secrets.token_urlsafe(4)
     db.add(
         EmailVerificationToken(
             user_id=user.id,
@@ -75,8 +75,9 @@ def register(data: RegisterRequest, db: Session = Depends(get_db)) -> dict:
     )
     db.commit()
 
-    # TODO: заменить на реальную отправку письма через почтовый сервис.
+    # TODO: заменить на реальную отправку письма через бота
     logger.info("[EMAIL VERIFICATION] %s: token=%s", email, raw_token)
+    print(f"[EMAIL VERIFICATION] {email}: code={raw_token}")
 
     return {
         "status": "pending_verification",

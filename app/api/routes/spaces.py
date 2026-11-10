@@ -1,69 +1,22 @@
-from fastapi import (
-    APIRouter,
-    Depends,
-    status,
-)
-from sqlalchemy import select
+from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
-from app.api.deps import get_current_user, get_db
-from app.core.error import AppError
+from app.api.deps import (
+    get_current_user,
+    get_db,
+    get_space_or_404,
+    require_space_access,
+    require_space_owner,
+)
 from app.crud import space as space_crud
-from backend.models import RagSpace, SpaceMember, User
+from backend.models import User
 from backend.schemas.space import (
     RagSpaceCreate,
     RagSpaceResponse,
     RagSpaceUpdate,
 )
 
-router = APIRouter(
-    prefix="/spaces",
-    tags=["spaces"],
-)
-
-#переделан user id, теперь нельзя просто так достать, берем из токена
-def _get_accessible_space(
-    db: Session,
-    space_id: int,
-    user: User,
-) -> RagSpace:
-    space = space_crud.get_space(db, space_id)
-    if space is None:
-        raise AppError(
-            status_code=status.HTTP_404_NOT_FOUND,
-            code="space_not_found",
-            message=f"Space {space_id} not found",
-        )
-
-    is_owner = space.owner_id == user.id
-    is_member = db.scalar(
-        select(SpaceMember.id).where(
-            SpaceMember.space_id == space_id,
-            SpaceMember.user_id == user.id,
-        )
-    ) is not None
-
-    if not (is_owner or is_member or space.access_mode == "public"):
-        raise AppError(
-            status_code=status.HTTP_403_FORBIDDEN,
-            code="access_denied",
-            message="Нет доступа к пространству",
-        )
-
-    return space
-
-
-def _require_owner(
-    db: Session,
-    space: RagSpace,
-    user: User,
-) -> None:
-    if space.owner_id != user.id:
-        raise AppError(
-            status_code=status.HTTP_403_FORBIDDEN,
-            code="not_owner",
-            message="Только владелец может изменять пространство",
-        )
+router = APIRouter(prefix="/spaces", tags=["spaces"])
 
 
 @router.post(
@@ -101,7 +54,9 @@ def get_space(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ) -> RagSpaceResponse:
-    return _get_accessible_space(db, space_id, current_user)
+    space = get_space_or_404(db, space_id)
+    require_space_access(db, space, current_user)
+    return space
 
 
 @router.patch(
@@ -114,8 +69,9 @@ def update_space(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ) -> RagSpaceResponse:
-    space = _get_accessible_space(db, space_id, current_user)
-    _require_owner(db, space, current_user)
+    space = get_space_or_404(db, space_id)
+    require_space_access(db, space, current_user)
+    require_space_owner(space, current_user)
     return space_crud.update_space(db, space, data)
 
 
@@ -128,6 +84,7 @@ def delete_space(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ) -> None:
-    space = _get_accessible_space(db, space_id, current_user)
-    _require_owner(db, space, current_user)
+    space = get_space_or_404(db, space_id)
+    require_space_access(db, space, current_user)
+    require_space_owner(space, current_user)
     space_crud.delete_space(db, space)
