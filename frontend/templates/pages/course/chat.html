@@ -1,14 +1,36 @@
 <!DOCTYPE html>
 <html lang="ru">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
     <title>Курс — NSU RAG</title>
 
-    <link rel="stylesheet" href="/static/css/tokens.css">
-    <link rel="stylesheet" href="/static/css/base.css">
-    <link rel="stylesheet" href="/static/css/layout.css">
+    <link
+        rel="stylesheet"
+        href="/static/css/tokens.css"
+    >
+    <link
+        rel="stylesheet"
+        href="/static/css/base.css"
+    >
+    <link
+        rel="stylesheet"
+        href="/static/css/layout.css"
+    >
+    <link
+        rel="stylesheet"
+        href="/static/css/components/card.css"
+    >
+
+    <script
+        src="/static/js/course.js"
+        defer
+    ></script>
 </head>
 
 <body>
@@ -17,9 +39,19 @@
 
     <aside class="sidebar">
 
-        <div class="sidebar-logo">
-            NSU RAG
-        </div>
+        <a
+            href="../courses.html"
+            class="sidebar-logo"
+        >
+            <span class="sidebar-logo-icon">
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+            </span>
+
+            <span>NSU RAG</span>
+        </a>
 
         <nav class="sidebar-nav">
 
@@ -27,21 +59,48 @@
                 href="../courses.html"
                 class="sidebar-link"
             >
-                Все курсы
+                <svg
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                >
+                    <rect x="3" y="3" width="7" height="7" rx="1"></rect>
+                    <rect x="14" y="3" width="7" height="7" rx="1"></rect>
+                    <rect x="3" y="14" width="7" height="7" rx="1"></rect>
+                    <rect x="14" y="14" width="7" height="7" rx="1"></rect>
+                </svg>
+
+                <span>Все курсы</span>
             </a>
 
             <a
                 href="../my-courses.html"
                 class="sidebar-link"
             >
-                Мои курсы
+                <svg
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                >
+                    <path
+                        d="M12 3.5L14.7 8.97L20.74 9.85L16.37 14.11L17.4 20.13L12 17.29L6.6 20.13L7.63 14.11L3.26 9.85L9.3 8.97L12 3.5Z"
+                    ></path>
+                </svg>
+
+                <span>Мои курсы</span>
             </a>
 
             <a
                 href="../profile.html"
                 class="sidebar-link"
             >
-                Профиль
+                <svg
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                >
+                    <circle cx="12" cy="8" r="4"></circle>
+                    <path d="M4.5 21a7.5 7.5 0 0 1 15 0"></path>
+                </svg>
+
+                <span>Профиль</span>
             </a>
 
         </nav>
@@ -51,36 +110,74 @@
 
     <main class="app-content">
 
+        <a
+            href="../courses.html"
+            class="course-back"
+        >
+            <svg
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+            >
+                <path d="M15 18L9 12L15 6"></path>
+            </svg>
+
+            Все курсы
+        </a>
+
+
         <header class="page-header">
 
-            <h1>Название курса</h1>
+            <div>
 
-            <p>
-                Рабочее пространство курса
-            </p>
+                <h1 id="course-title">
+                    Загрузка курса...
+                </h1>
+
+                <p>
+                    Рабочее пространство курса
+                </p>
+
+            </div>
 
         </header>
 
 
-        <nav class="course-tabs">
+        <nav class="workspace-tabs">
 
-            <a class="course-tab active" href="chat.html">
-                Чат с RAG
+            <a
+                id="chat-tab"
+                href="chat.html"
+                class="workspace-tab active"
+            >
+                AI-помощник
             </a>
 
-            <a class="course-tab" href="materials.html">
+            <a
+                id="materials-tab"
+                href="materials.html"
+                class="workspace-tab"
+            >
                 Материалы курса
             </a>
 
         </nav>
 
 
-        <section>
-            <h2>Чат с RAG</h2>
+        <p
+            id="course-error"
+            class="page-error"
+        ></p>
+
+
+        <section class="workspace-placeholder">
+
+            <h2>AI-помощник</h2>
 
             <p>
-                Здесь будет интерфейс чата по материалам курса.
+                Интерфейс работы с RAG будет добавлен
+                на следующем этапе.
             </p>
+
         </section>
 
     </main>
@@ -88,4 +185,5 @@
 </div>
 
 </body>
+
 </html>

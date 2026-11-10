@@ -1,75 +1,245 @@
 .app-layout {
     min-height: 100vh;
-    background: #f7f9f7;
+
+    background: #f7faf5;
 }
+
+
+/* Боковая панель */
 
 .sidebar {
     position: fixed;
     top: 0;
     left: 0;
+    z-index: 20;
 
     width: 250px;
     height: 100vh;
 
-    padding: 32px 20px;
+    padding: 28px 18px;
 
-    background: #ffffff;
-    border-right: 1px solid var(--color-border);
+    background: rgba(255, 255, 255, 0.96);
+
+    border-right: 1px solid #dce6d8;
+
+    box-shadow:
+        6px 0 24px rgba(47, 72, 40, 0.035);
 }
+
 
 .sidebar-logo {
-    margin-bottom: 42px;
+    height: 42px;
 
-    color: var(--color-primary);
+    margin: 0 10px 42px;
 
-    font-size: 22px;
+    display: flex;
+    align-items: center;
+    gap: 11px;
+
+    color: var(--color-text);
+
+    font-size: 19px;
     font-weight: 700;
+
+    text-decoration: none;
 }
+
+
+.sidebar-logo-icon {
+    width: 21px;
+    height: 21px;
+
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+
+    gap: 2px;
+}
+
+
+.sidebar-logo-icon span {
+    background: var(--color-primary);
+
+    border-radius: 2px;
+}
+
 
 .sidebar-nav {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+
+    gap: 7px;
 }
 
+
 .sidebar-link {
-    padding: 12px 14px;
+    min-height: 48px;
 
-    border-radius: var(--radius-md);
+    padding: 0 14px;
 
-    color: var(--color-text);
-    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 13px;
+
+    border: 1px solid transparent;
+    border-radius: 11px;
+
+    color: #4d5b54;
 
     font-size: 15px;
     font-weight: 500;
+
+    text-decoration: none;
+
+    transition:
+        background-color 0.2s,
+        border-color 0.2s,
+        color 0.2s,
+        transform 0.15s;
 }
 
-.sidebar-link:hover {
-    background: var(--color-primary-light);
+
+.sidebar-link svg {
+    width: 20px;
+    height: 20px;
+
+    flex-shrink: 0;
+
+    fill: none;
+
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
 }
+
+
+.sidebar-link:hover {
+    background: #f2f7ef;
+
+    color: var(--color-text);
+
+    transform: translateX(2px);
+}
+
 
 .sidebar-link.active {
     background: var(--color-primary-light);
+
+    border-color: #cfdfc9;
+
+    color: var(--color-primary-hover);
+
+    font-weight: 600;
+}
+
+
+.sidebar-link.active svg {
     color: var(--color-primary);
 }
 
+
+/* Основная область */
+
 .app-content {
+    position: relative;
+
+    min-height: 100vh;
+
     margin-left: 250px;
-    padding: 42px 48px;
+    padding: 48px 54px 70px;
+
+    overflow: hidden;
+
+    background:
+        linear-gradient(
+            135deg,
+            #f8fbf6 0%,
+            #f8fbf6 64%,
+            #eef6ea 64%,
+            #eef6ea 100%
+        );
 }
 
-.page-header {
-    margin-bottom: 32px;
+
+.app-content::before {
+    content: "";
+
+    position: absolute;
+    top: -240px;
+    right: -220px;
+
+    width: 620px;
+    height: 620px;
+
+    border: 1px solid rgba(85, 157, 69, 0.10);
+    border-radius: 50%;
+
+    box-shadow:
+        0 0 0 70px rgba(85, 157, 69, 0.025),
+        0 0 0 140px rgba(85, 157, 69, 0.018);
+
+    pointer-events: none;
 }
+
+
+.app-content > * {
+    position: relative;
+    z-index: 1;
+}
+
+
+/* Заголовок страницы */
+
+.page-header {
+    max-width: 1180px;
+
+    margin-bottom: 30px;
+
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+
+    gap: 30px;
+}
+
 
 .page-header h1 {
     margin: 0 0 8px;
 
-    font-size: 30px;
+    color: var(--color-text);
+
+    font-size: 38px;
+    line-height: 1.15;
+    font-weight: 700;
+
+    letter-spacing: -0.5px;
 }
+
 
 .page-header p {
     margin: 0;
 
     color: var(--color-text-secondary);
+
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+
+/* Ошибки */
+
+.page-error {
+    max-width: 1180px;
+
+    margin: 0 0 22px;
+
+    color: var(--color-error);
+
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+
+.page-error:empty {
+    display: none;
 }

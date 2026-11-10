@@ -1,15 +1,36 @@
 <!DOCTYPE html>
 <html lang="ru">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
     <title>Мои курсы — NSU RAG</title>
 
-    <link rel="stylesheet" href="/static/css/tokens.css">
-    <link rel="stylesheet" href="/static/css/base.css">
-    <link rel="stylesheet" href="/static/css/layout.css">
-    <link rel="stylesheet" href="/static/css/components/card.css">
+    <link
+        rel="stylesheet"
+        href="/static/css/tokens.css"
+    >
+    <link
+        rel="stylesheet"
+        href="/static/css/base.css"
+    >
+    <link
+        rel="stylesheet"
+        href="/static/css/layout.css"
+    >
+    <link
+        rel="stylesheet"
+        href="/static/css/components/card.css"
+    >
+
+    <script
+        src="/static/js/courses.js"
+        defer
+    ></script>
 </head>
 
 <body>
@@ -18,9 +39,19 @@
 
     <aside class="sidebar">
 
-        <div class="sidebar-logo">
-            NSU RAG
-        </div>
+        <a
+            href="courses.html"
+            class="sidebar-logo"
+        >
+            <span class="sidebar-logo-icon">
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+            </span>
+
+            <span>NSU RAG</span>
+        </a>
 
         <nav class="sidebar-nav">
 
@@ -28,21 +59,48 @@
                 href="courses.html"
                 class="sidebar-link"
             >
-                Все курсы
+                <svg
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                >
+                    <rect x="3" y="3" width="7" height="7" rx="1"></rect>
+                    <rect x="14" y="3" width="7" height="7" rx="1"></rect>
+                    <rect x="3" y="14" width="7" height="7" rx="1"></rect>
+                    <rect x="14" y="14" width="7" height="7" rx="1"></rect>
+                </svg>
+
+                <span>Все курсы</span>
             </a>
 
             <a
                 href="my-courses.html"
                 class="sidebar-link active"
             >
-                Мои курсы
+                <svg
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                >
+                    <path
+                        d="M12 3.5L14.7 8.97L20.74 9.85L16.37 14.11L17.4 20.13L12 17.29L6.6 20.13L7.63 14.11L3.26 9.85L9.3 8.97L12 3.5Z"
+                    ></path>
+                </svg>
+
+                <span>Мои курсы</span>
             </a>
 
             <a
                 href="profile.html"
                 class="sidebar-link"
             >
-                Профиль
+                <svg
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                >
+                    <circle cx="12" cy="8" r="4"></circle>
+                    <path d="M4.5 21a7.5 7.5 0 0 1 15 0"></path>
+                </svg>
+
+                <span>Профиль</span>
             </a>
 
         </nav>
@@ -53,108 +111,128 @@
     <main class="app-content">
 
         <header class="page-header">
-            <h1>Мои курсы</h1>
 
-            <p>
-                Курсы, которыми вы владеете или в которых состоите
-            </p>
+            <div>
+                <h1>Мои курсы</h1>
+
+                <p>
+                    Курсы, которыми вы владеете или в которых состоите
+                </p>
+            </div>
+
         </header>
 
 
-        <div class="course-tabs">
+        <div class="my-courses-tabs">
 
             <button
-                class="course-tab active"
+                type="button"
+                class="my-courses-tab active"
                 data-tab="owned"
             >
                 Владею
+
+                <span
+                    id="owned-count"
+                    class="course-count"
+                >
+                    0
+                </span>
             </button>
 
             <button
-                class="course-tab"
+                type="button"
+                class="my-courses-tab"
                 data-tab="joined"
             >
                 Состою
+
+                <span
+                    id="joined-count"
+                    class="course-count"
+                >
+                    0
+                </span>
             </button>
 
         </div>
 
 
+        <p
+            id="courses-error"
+            class="page-error"
+        ></p>
+
+
         <section
             id="owned"
-            class="course-grid course-tab-content active"
+            class="my-courses-content active"
         >
+            <div
+                id="owned-grid"
+                class="course-grid"
+            ></div>
 
-            <article class="course-card">
+            <div
+                id="owned-empty"
+                class="courses-empty"
+                hidden
+            >
+                <div class="courses-empty-icon">
+                    <svg
+                        viewBox="0 0 24 24"
+                        aria-hidden="true"
+                    >
+                        <path d="M12 5v14"></path>
+                        <path d="M5 12h14"></path>
+                    </svg>
+                </div>
 
-                <a
-                    href="course/chat.html"
-                    class="course-card-link"
-                    aria-label="Открыть курс"
-                ></a>
+                <h2>У вас пока нет своих курсов</h2>
 
-                <h2>Курс 1</h2>
-
-                <p class="course-card-description">
-                    Вы владелец этого курса
+                <p>
+                    Созданные вами курсы появятся здесь.
                 </p>
-
-            </article>
-
+            </div>
         </section>
 
 
         <section
             id="joined"
-            class="course-grid course-tab-content"
+            class="my-courses-content"
         >
+            <div
+                id="joined-grid"
+                class="course-grid"
+            ></div>
 
-            <article class="course-card">
+            <div
+                id="joined-empty"
+                class="courses-empty"
+                hidden
+            >
+                <div class="courses-empty-icon">
+                    <svg
+                        viewBox="0 0 24 24"
+                        aria-hidden="true"
+                    >
+                        <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21.5z"></path>
+                        <path d="M4 5.5v16"></path>
+                    </svg>
+                </div>
 
-                <a
-                    href="course/chat.html"
-                    class="course-card-link"
-                    aria-label="Открыть курс"
-                ></a>
+                <h2>Нет курсов</h2>
 
-                <h2>Курс 2</h2>
-
-                <p class="course-card-description">
-                    Вы участник этого курса
+                <p>
+                    Курсы, в которых вы состоите, появятся здесь.
                 </p>
-
-            </article>
-
+            </div>
         </section>
 
     </main>
 
 </div>
 
-
-<script>
-    const tabs = document.querySelectorAll(".course-tab");
-    const contents = document.querySelectorAll(".course-tab-content");
-
-    tabs.forEach(tab => {
-        tab.addEventListener("click", () => {
-
-            tabs.forEach(item => {
-                item.classList.remove("active");
-            });
-
-            contents.forEach(content => {
-                content.classList.remove("active");
-            });
-
-            tab.classList.add("active");
-
-            document
-                .getElementById(tab.dataset.tab)
-                .classList.add("active");
-        });
-    });
-</script>
-
 </body>
+
 </html>

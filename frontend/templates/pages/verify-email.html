@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Подтверждение почты — NSU RAG</title>
+
+    <link
+        rel="stylesheet"
+        href="/static/css/tokens.css"
+    >
+    <link
+        rel="stylesheet"
+        href="/static/css/base.css"
+    >
+    <link
+        rel="stylesheet"
+        href="/static/css/components/form.css"
+    >
+
+    <script
+        src="/static/js/auth.js"
+        defer
+    ></script>
+</head>
+
+<body>
+
+<main class="auth-page">
+
+    <section class="auth-info">
+
+        <div class="auth-logo">
+            <div class="logo-icon">
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+
+            <span>NSU RAG</span>
+        </div>
+
+        <div class="auth-info-content">
+
+            <h1>
+                Учебные материалы<br>
+                и AI-помощник в одном<br>
+                месте
+            </h1>
+
+            <p>
+                Получайте точные ответы на основе материалов ваших курсов.
+                Загружайте документы, задавайте вопросы и учитесь эффективнее.
+            </p>
+
+        </div>
+
+    </section>
+
+    <section class="auth-form-section">
+
+        <div class="auth-form-container verify-container">
+
+            <a
+                href="register.html"
+                class="auth-back-link"
+            >
+                <svg
+                    class="auth-back-icon"
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                >
+                    <path d="M15 18L9 12L15 6"></path>
+                </svg>
+
+                <span>Вернуться к регистрации</span>
+            </a>
+
+            <div class="verify-content">
+
+                <h2>Подтверждение почты</h2>
+
+                <p class="auth-description verify-description">
+                    Введите код подтверждения из письма,
+                    отправленного на вашу университетскую почту.
+                </p>
+
+                <form
+                    id="verify-form"
+                    class="auth-form"
+                >
+
+                    <div class="form-field">
+
+                        <label for="token">
+                            Код подтверждения
+                        </label>
+
+                        <input
+                            type="text"
+                            id="token"
+                            name="token"
+                            placeholder="Введите код из письма"
+                            autocomplete="one-time-code"
+                            required
+                        >
+
+                    </div>
+
+                    <p
+                        id="form-error"
+                        class="form-error"
+                    ></p>
+
+                    <button
+                        type="submit"
+                        class="auth-button"
+                    >
+                        Подтвердить почту
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </section>
+
+</main>
+
+</body>
+
+</html>

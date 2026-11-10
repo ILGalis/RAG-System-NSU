@@ -1,15 +1,36 @@
 <!DOCTYPE html>
 <html lang="ru">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
     <title>Все курсы — NSU RAG</title>
 
-    <link rel="stylesheet" href="/static/css/tokens.css">
-    <link rel="stylesheet" href="/static/css/base.css">
-    <link rel="stylesheet" href="/static/css/layout.css">
-    <link rel="stylesheet" href="/static/css/components/card.css">
+    <link
+        rel="stylesheet"
+        href="/static/css/tokens.css"
+    >
+    <link
+        rel="stylesheet"
+        href="/static/css/base.css"
+    >
+    <link
+        rel="stylesheet"
+        href="/static/css/layout.css"
+    >
+    <link
+        rel="stylesheet"
+        href="/static/css/components/card.css"
+    >
+
+    <script
+        src="/static/js/courses.js"
+        defer
+    ></script>
 </head>
 
 <body>
@@ -18,9 +39,19 @@
 
     <aside class="sidebar">
 
-        <div class="sidebar-logo">
-            NSU RAG
-        </div>
+        <a
+            href="courses.html"
+            class="sidebar-logo"
+        >
+            <span class="sidebar-logo-icon">
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+            </span>
+
+            <span>NSU RAG</span>
+        </a>
 
         <nav class="sidebar-nav">
 
@@ -28,21 +59,48 @@
                 href="courses.html"
                 class="sidebar-link active"
             >
-                Все курсы
+                <svg
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                >
+                    <rect x="3" y="3" width="7" height="7" rx="1"></rect>
+                    <rect x="14" y="3" width="7" height="7" rx="1"></rect>
+                    <rect x="3" y="14" width="7" height="7" rx="1"></rect>
+                    <rect x="14" y="14" width="7" height="7" rx="1"></rect>
+                </svg>
+
+                <span>Все курсы</span>
             </a>
 
             <a
                 href="my-courses.html"
                 class="sidebar-link"
             >
-                Мои курсы
+                <svg
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                >
+                    <path
+                        d="M12 3.5L14.7 8.97L20.74 9.85L16.37 14.11L17.4 20.13L12 17.29L6.6 20.13L7.63 14.11L3.26 9.85L9.3 8.97L12 3.5Z"
+                    ></path>
+                </svg>
+
+                <span>Мои курсы</span>
             </a>
 
             <a
                 href="profile.html"
                 class="sidebar-link"
             >
-                Профиль
+                <svg
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                >
+                    <circle cx="12" cy="8" r="4"></circle>
+                    <path d="M4.5 21a7.5 7.5 0 0 1 15 0"></path>
+                </svg>
+
+                <span>Профиль</span>
             </a>
 
         </nav>
@@ -53,98 +111,77 @@
     <main class="app-content">
 
         <header class="page-header">
-            <h1>Все курсы</h1>
 
-            <p>
-                Доступные учебные курсы
-            </p>
+            <div>
+                <h1>Все курсы</h1>
+
+                <p>
+                    Доступные вам учебные курсы
+                </p>
+            </div>
+
         </header>
 
 
-        <section class="course-grid">
+        <div class="course-search">
 
-            <article class="course-card">
+            <svg
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+            >
+                <circle cx="11" cy="11" r="7"></circle>
+                <path d="m20 20-4-4"></path>
+            </svg>
 
-                <a
-                    href="course/chat.html"
-                    class="course-card-link"
-                    aria-label="Открыть курс"
-                ></a>
+            <input
+                type="search"
+                id="course-search"
+                placeholder="Поиск по курсам"
+                autocomplete="off"
+            >
 
-                <h2>Курс 1</h2>
-
-                <p class="course-card-description">
-                    Описание курса
-                </p>
-
-                <div class="course-card-actions">
-                    <button
-                        class="course-add-button"
-                        type="button"
-                    >
-                        Добавить в мои курсы
-                    </button>
-                </div>
-
-            </article>
+        </div>
 
 
-            <article class="course-card">
-
-                <a
-                    href="course/chat.html"
-                    class="course-card-link"
-                    aria-label="Открыть курс"
-                ></a>
-
-                <h2>Курс 2</h2>
-
-                <p class="course-card-description">
-                    Описание курса
-                </p>
-
-                <div class="course-card-actions">
-                    <button
-                        class="course-add-button"
-                        type="button"
-                    >
-                        Добавить в мои курсы
-                    </button>
-                </div>
-
-            </article>
+        <p
+            id="courses-error"
+            class="page-error"
+        ></p>
 
 
-            <article class="course-card">
+        <section
+            id="courses-grid"
+            class="course-grid"
+            aria-live="polite"
+        ></section>
 
-                <a
-                    href="course/chat.html"
-                    class="course-card-link"
-                    aria-label="Открыть курс"
-                ></a>
 
-                <h2>Курс 3</h2>
+        <div
+            id="courses-empty"
+            class="courses-empty"
+            hidden
+        >
+            <div class="courses-empty-icon">
+                <svg
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                >
+                    <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21.5z"></path>
+                    <path d="M4 5.5v16"></path>
+                </svg>
+            </div>
 
-                <p class="course-card-description">
-                    Описание курса
-                </p>
+            <h2>Курсы не найдены</h2>
 
-                <div class="course-card-actions">
-                    <button
-                        class="course-add-button"
-                        type="button"
-                    >
-                        Добавить в мои курсы
-                    </button>
-                </div>
-
-            </article>
-
-        </section>
+            <p>
+                Попробуйте изменить поисковый запрос.
+            </p>
+        </div>
 
     </main>
 
 </div>
 
 </body>
+
 </html>

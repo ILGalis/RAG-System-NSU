@@ -1,5 +1,6 @@
 const API = {
     register: "/auth/register",
+    verifyEmail: "/auth/verify-email",
     login: "/auth/login"
 };
 
@@ -47,8 +48,8 @@ async function handleLogin(form) {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                email: email,
-                password: password
+                email,
+                password
             })
         });
 
@@ -78,23 +79,12 @@ async function handleLogin(form) {
 
 async function handleRegister(form) {
     const errorElement = document.getElementById("form-error");
-    const noticeElement = document.getElementById("auth-notice");
     const button = form.querySelector('button[type="submit"]');
 
     errorElement.textContent = "";
 
     const email = form.email.value.trim();
     const password = form.password.value;
-
-    /*
-     * Имя и фамилия уже есть в интерфейсе.
-     * Backend пока их не принимает.
-     *
-     * После изменения API сюда будут добавлены:
-     *
-     * first_name: form.first_name.value.trim(),
-     * last_name: form.last_name.value.trim()
-     */
 
     button.disabled = true;
 
@@ -105,8 +95,8 @@ async function handleRegister(form) {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                email: email,
-                password: password
+                email,
+                password
             })
         });
 
@@ -120,10 +110,48 @@ async function handleRegister(form) {
             return;
         }
 
-        form.reset();
+        window.location.href = "verify-email.html";
+    } catch {
+        errorElement.textContent =
+            "Не удалось подключиться к серверу.";
+    } finally {
+        button.disabled = false;
+    }
+}
 
-        noticeElement.textContent =
-            data.message || "Регистрация завершена. Проверьте почту.";
+
+async function handleVerifyEmail(form) {
+    const errorElement = document.getElementById("form-error");
+    const button = form.querySelector('button[type="submit"]');
+
+    errorElement.textContent = "";
+
+    const token = form.token.value.trim();
+
+    button.disabled = true;
+
+    try {
+        const response = await fetch(API.verifyEmail, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                token
+            })
+        });
+
+        const data = await readResponse(response);
+
+        if (!response.ok) {
+            errorElement.textContent = getErrorMessage(
+                data,
+                "Не удалось подтвердить почту."
+            );
+            return;
+        }
+
+        window.location.href = "login.html";
     } catch {
         errorElement.textContent =
             "Не удалось подключиться к серверу.";
@@ -136,6 +164,7 @@ async function handleRegister(form) {
 document.addEventListener("DOMContentLoaded", () => {
     const loginForm = document.getElementById("login-form");
     const registerForm = document.getElementById("register-form");
+    const verifyForm = document.getElementById("verify-form");
 
     if (loginForm) {
         loginForm.addEventListener("submit", (event) => {
@@ -148,6 +177,13 @@ document.addEventListener("DOMContentLoaded", () => {
         registerForm.addEventListener("submit", (event) => {
             event.preventDefault();
             handleRegister(registerForm);
+        });
+    }
+
+    if (verifyForm) {
+        verifyForm.addEventListener("submit", (event) => {
+            event.preventDefault();
+            handleVerifyEmail(verifyForm);
         });
     }
 });
