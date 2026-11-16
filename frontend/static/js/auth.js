@@ -16,6 +16,10 @@ async function readResponse(response) {
 
 function getErrorMessage(data, fallback) {
     if (data?.error?.message) {
+        if (data.error.code === "invalid_token") {
+            return "Код подтверждения недействителен или истёк.";
+        }
+
         return data.error.message;
     }
 
@@ -30,47 +34,110 @@ function getErrorMessage(data, fallback) {
 }
 
 
-async function handleLogin(form) {
-    const errorElement = document.getElementById("form-error");
-    const button = form.querySelector('button[type="submit"]');
+function saveAuthenticatedUser(data) {
+    localStorage.setItem(
+        "access_token",
+        data.access_token
+    );
 
-    errorElement.textContent = "";
+    localStorage.setItem(
+        "token_type",
+        data.token_type
+    );
 
-    const email = form.email.value.trim();
-    const password = form.password.value;
+    localStorage.setItem(
+        "user_id",
+        String(data.user.id)
+    );
 
-    button.disabled = true;
+    localStorage.setItem(
+        "user_role",
+        data.user.role
+    );
 
-    try {
-        const response = await fetch(API.login, {
+    localStorage.setItem(
+        "user_email",
+        data.user.email
+    );
+
+    localStorage.setItem(
+        "user_first_name",
+        data.user.first_name
+    );
+
+    localStorage.setItem(
+        "user_last_name",
+        data.user.last_name
+    );
+}
+
+
+async function loginUser(email, password) {
+    const response = await fetch(
+        API.login,
+        {
             method: "POST",
             headers: {
-                "Content-Type": "application/json"
+                "Content-Type":
+                    "application/json"
             },
             body: JSON.stringify({
                 email,
                 password
             })
-        });
-
-        const data = await readResponse(response);
-
-        if (!response.ok) {
-            errorElement.textContent = getErrorMessage(
-                data,
-                "Не удалось войти в систему."
-            );
-            return;
         }
+    );
 
-        localStorage.setItem("access_token", data.access_token);
-        localStorage.setItem("token_type", data.token_type);
-        localStorage.setItem("user_id", String(data.user_id));
+    const data =
+        await readResponse(response);
 
-        window.location.href = "courses.html";
-    } catch {
+    if (!response.ok) {
+        throw new Error(
+            getErrorMessage(
+                data,
+                "Не удалось автоматически войти в систему."
+            )
+        );
+    }
+
+    saveAuthenticatedUser(data);
+}
+
+
+async function handleLogin(form) {
+    const errorElement =
+        document.getElementById(
+            "form-error"
+        );
+
+    const button =
+        form.querySelector(
+            'button[type="submit"]'
+        );
+
+    errorElement.textContent = "";
+
+    const email =
+        form.email.value.trim();
+
+    const password =
+        form.password.value;
+
+    button.disabled = true;
+
+    try {
+        await loginUser(
+            email,
+            password
+        );
+
+        window.location.href =
+            "courses.html";
+
+    } catch (error) {
         errorElement.textContent =
-            "Не удалось подключиться к серверу.";
+            error.message;
+
     } finally {
         button.disabled = false;
     }
@@ -78,42 +145,90 @@ async function handleLogin(form) {
 
 
 async function handleRegister(form) {
-    const errorElement = document.getElementById("form-error");
-    const button = form.querySelector('button[type="submit"]');
+    const errorElement =
+        document.getElementById(
+            "form-error"
+        );
+
+    const button =
+        form.querySelector(
+            'button[type="submit"]'
+        );
 
     errorElement.textContent = "";
 
-    const email = form.email.value.trim();
-    const password = form.password.value;
+    const firstName =
+        form.first_name.value.trim();
+
+    const lastName =
+        form.last_name.value.trim();
+
+    const email =
+        form.email.value.trim();
+
+    const password =
+        form.password.value;
 
     button.disabled = true;
 
     try {
-        const response = await fetch(API.register, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                email,
-                password
-            })
-        });
+        const response =
+            await fetch(
+                API.register,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+                    body: JSON.stringify({
+                        email,
+                        password,
+                        first_name: firstName,
+                        last_name: lastName
+                    })
+                }
+            );
 
-        const data = await readResponse(response);
+        const data =
+            await readResponse(response);
 
         if (!response.ok) {
-            errorElement.textContent = getErrorMessage(
-                data,
-                "Не удалось зарегистрироваться."
-            );
+            errorElement.textContent =
+                getErrorMessage(
+                    data,
+                    "Не удалось зарегистрироваться."
+                );
+
             return;
         }
 
-        window.location.href = "verify-email.html";
+
+        /*
+         * Временно сохраняем данные только
+         * до подтверждения почты.
+         *
+         * После успешной верификации они
+         * будут удалены.
+         */
+        sessionStorage.setItem(
+            "pending_email",
+            email
+        );
+
+        sessionStorage.setItem(
+            "pending_password",
+            password
+        );
+
+
+        window.location.href =
+            "verify-email.html";
+
     } catch {
         errorElement.textContent =
             "Не удалось подключиться к серверу.";
+
     } finally {
         button.disabled = false;
     }
@@ -121,69 +236,159 @@ async function handleRegister(form) {
 
 
 async function handleVerifyEmail(form) {
-    const errorElement = document.getElementById("form-error");
-    const button = form.querySelector('button[type="submit"]');
+    const errorElement =
+        document.getElementById(
+            "form-error"
+        );
+
+    const button =
+        form.querySelector(
+            'button[type="submit"]'
+        );
 
     errorElement.textContent = "";
 
-    const token = form.token.value.trim();
+    const token =
+        form.token.value.trim();
 
     button.disabled = true;
 
     try {
-        const response = await fetch(API.verifyEmail, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                token
-            })
-        });
+        const response =
+            await fetch(
+                API.verifyEmail,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+                    body: JSON.stringify({
+                        token
+                    })
+                }
+            );
 
-        const data = await readResponse(response);
+        const data =
+            await readResponse(response);
 
         if (!response.ok) {
-            errorElement.textContent = getErrorMessage(
-                data,
-                "Не удалось подтвердить почту."
-            );
+            errorElement.textContent =
+                getErrorMessage(
+                    data,
+                    "Не удалось подтвердить почту."
+                );
+
             return;
         }
 
-        window.location.href = "login.html";
-    } catch {
+
+        const email =
+            sessionStorage.getItem(
+                "pending_email"
+            );
+
+        const password =
+            sessionStorage.getItem(
+                "pending_password"
+            );
+
+
+        if (!email || !password) {
+            window.location.href =
+                "login.html";
+
+            return;
+        }
+
+
+        await loginUser(
+            email,
+            password
+        );
+
+
+        sessionStorage.removeItem(
+            "pending_email"
+        );
+
+        sessionStorage.removeItem(
+            "pending_password"
+        );
+
+
+        window.location.href =
+            "courses.html";
+
+    } catch (error) {
         errorElement.textContent =
+            error.message ||
             "Не удалось подключиться к серверу.";
+
     } finally {
         button.disabled = false;
     }
 }
 
 
-document.addEventListener("DOMContentLoaded", () => {
-    const loginForm = document.getElementById("login-form");
-    const registerForm = document.getElementById("register-form");
-    const verifyForm = document.getElementById("verify-form");
+document.addEventListener(
+    "DOMContentLoaded",
+    () => {
+        const loginForm =
+            document.getElementById(
+                "login-form"
+            );
 
-    if (loginForm) {
-        loginForm.addEventListener("submit", (event) => {
-            event.preventDefault();
-            handleLogin(loginForm);
-        });
-    }
+        const registerForm =
+            document.getElementById(
+                "register-form"
+            );
 
-    if (registerForm) {
-        registerForm.addEventListener("submit", (event) => {
-            event.preventDefault();
-            handleRegister(registerForm);
-        });
-    }
+        const verifyForm =
+            document.getElementById(
+                "verify-form"
+            );
 
-    if (verifyForm) {
-        verifyForm.addEventListener("submit", (event) => {
-            event.preventDefault();
-            handleVerifyEmail(verifyForm);
-        });
+
+        if (loginForm) {
+            loginForm.addEventListener(
+                "submit",
+                (event) => {
+                    event.preventDefault();
+
+                    handleLogin(
+                        loginForm
+                    );
+                }
+            );
+        }
+
+
+        if (registerForm) {
+            registerForm.addEventListener(
+                "submit",
+                (event) => {
+                    event.preventDefault();
+
+                    handleRegister(
+                        registerForm
+                    );
+                }
+            );
+        }
+
+
+        if (verifyForm) {
+            verifyForm.addEventListener(
+                "submit",
+                (event) => {
+                    event.preventDefault();
+
+                    handleVerifyEmail(
+                        verifyForm
+                    );
+                }
+            );
+        }
     }
-});
+);
