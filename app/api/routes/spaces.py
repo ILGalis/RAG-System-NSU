@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
+from app.core.error import AppError
 
 from app.api.deps import (
     get_current_user,
@@ -31,6 +32,8 @@ def create_space(
 ) -> RagSpaceResponse:
     # owner_id берём из токена
     data = data.model_copy(update={"owner_id": current_user.id})
+    if data.access_mode == "public" and current_user.role != "teacher":
+        raise AppError(403, "public_requires_teacher", "Публичные пространства создают только преподаватели")
     return space_crud.create_space(db, data)
 
 

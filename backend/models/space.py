@@ -9,7 +9,7 @@ from sqlalchemy import (
     func,
 )
 from sqlalchemy.orm import  Mapped, mapped_column, relationship
-
+from backend.models.user import User
 from backend.db.base import Base
 
 class RagSpace(Base):
@@ -27,6 +27,13 @@ class RagSpace(Base):
     name: Mapped[str] = mapped_column(
         String(200),
         nullable=False,
+    )
+
+    faculty: Mapped[str] = mapped_column(
+        String(200),
+        nullable=False,
+        default="",
+        server_default="",
     )
 
     owner_id: Mapped[int] = mapped_column(
@@ -53,6 +60,9 @@ class RagSpace(Base):
         cascade="all, delete-orphan",
     )
 
+    owner: Mapped["User"] = relationship("User", lazy="joined")
+
+    
 class SpaceMember(Base):
     __tablename__ = "space_members"
 

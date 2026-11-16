@@ -5,7 +5,7 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import select
 
-from backend.models import User
+from backend.models import User, RagSpace
 from backend.models.email_token import EmailVerificationToken
 from tests.conftest import TestingSessionLocal
 
@@ -245,3 +245,61 @@ def test_login_promotes_role_when_in_teachers(client: TestClient, monkeypatch):
     r = client.post("/auth/login", json={"email": email, "password": "strongpass123"})
     assert r.status_code == 200, r.text
     assert r.json()["user"]["role"] == "teacher"
+
+
+def test_delete_me_success(client, make_user):
+    u = make_user()
+    r = client.request(
+        "DELETE", "/auth/me",
+        headers=u["headers"],
+        json={"password": u["password"]},
+    )
+    assert r.status_code == 204, r.text
+
+    with TestingSessionLocal() as db:
+        assert db.scalar(select(User).where(User.email == u["email"])) is None
+
+    # токен больше не работает
+    assert client.get("/auth/me", headers=u["headers"]).status_code == 401
+
+
+def test_delete_me_wrong_password(client, make_user):
+    u = make_user()
+    r = client.request(
+        "DELETE", "/auth/me",
+        headers=u["headers"],
+        json={"password": "wrong"},
+    )
+    assert r.status_code == 401
+    assert r.json()["error"]["code"] == "invalid_password"
+
+    # юзер на месте
+    with TestingSessionLocal() as db:
+        assert db.scalar(select(User).where(User.email == u["email"])) is not None
+
+
+def test_delete_me_unauthenticated(client):
+    r = client.request(
+        "DELETE", "/auth/me",
+        json={"password": "strongpass123"},
+    )
+    assert r.status_code == 401
+
+
+def test_delete_me_cascades_spaces_and_documents(client, make_user):
+    u = make_user()
+    sid = client.post(
+        "/spaces",
+        headers=u["headers"],
+        json={"name": "S", "faculty": "", "owner_id": 1, "access_mode": "private"},
+    ).json()["id"]
+
+    r = client.request(
+        "DELETE", "/auth/me",
+        headers=u["headers"],
+        json={"password": u["password"]},
+    )
+    assert r.status_code == 204
+
+    with TestingSessionLocal() as db:
+        assert db.get(RagSpace, sid) is None

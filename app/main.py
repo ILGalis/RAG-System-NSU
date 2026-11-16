@@ -1,20 +1,20 @@
 from fastapi import FastAPI
 from sqlalchemy import text
 
-from app.api.routes import auth, spaces
+from app.api.routes import auth, spaces,document
 from app.core.error import register_error_handlers
 from backend.db.connection import engine
 
 app = FastAPI(
     title="NSU RAG API",
-    version="0.1.0",
+    version="0.1.1",
 )
 
 register_error_handlers(app)
 
 app.include_router(spaces.router)
 app.include_router(auth.router)
-
+app.include_router(document.router)
 @app.get("/health")
 def health_check():
     return {"status": "ok"}
