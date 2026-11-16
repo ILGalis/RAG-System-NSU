@@ -74,11 +74,13 @@ def register(data: RegisterRequest, db: Session = Depends(get_db)) -> dict:
         )
     )
     db.commit()
-
+    #
     # TODO: заменить на реальную отправку письма через бота
+    # 16.11 осталось подключить сюда бота + проверить
     logger.info("[EMAIL VERIFICATION] %s: token=%s", email, raw_token)
     print(f"[EMAIL VERIFICATION] {email}: code={raw_token}")
-
+    #
+    #
     return {
         "status": "pending_verification",
         "message": "Проверьте почту",
