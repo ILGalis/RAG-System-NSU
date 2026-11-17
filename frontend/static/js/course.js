@@ -1,17 +1,71 @@
 function getSpaceId() {
     const params =
-        new URLSearchParams(window.location.search);
+        new URLSearchParams(
+            window.location.search
+        );
 
-    return params.get("space_id");
+    return params.get(
+        "space_id"
+    );
 }
 
 
 function getAccessToken() {
-    return localStorage.getItem("access_token");
+    return localStorage.getItem(
+        "access_token"
+    );
 }
 
 
-async function readCourseResponse(response) {
+function getCurrentUserId() {
+    const value =
+        Number(
+            localStorage.getItem(
+                "user_id"
+            )
+        );
+
+    return Number.isFinite(value) &&
+        value > 0
+        ? value
+        : null;
+}
+
+
+function clearAuthData() {
+    localStorage.removeItem(
+        "access_token"
+    );
+
+    localStorage.removeItem(
+        "token_type"
+    );
+
+    localStorage.removeItem(
+        "user_id"
+    );
+
+    localStorage.removeItem(
+        "user_role"
+    );
+
+    localStorage.removeItem(
+        "user_email"
+    );
+
+    localStorage.removeItem(
+        "user_first_name"
+    );
+
+    localStorage.removeItem(
+        "user_last_name"
+    );
+}
+
+
+async function readCourseResponse(
+    response
+) {
     try {
         return await response.json();
     } catch {
@@ -20,108 +74,235 @@ async function readCourseResponse(response) {
 }
 
 
-function getCourseErrorMessage(data, fallback) {
+function getCourseErrorMessage(
+    data,
+    fallback
+) {
     if (data?.error?.message) {
         return data.error.message;
+    }
+
+    if (Array.isArray(data?.detail)) {
+        return data.detail
+            .map(
+                (item) =>
+                    item.msg
+            )
+            .filter(Boolean)
+            .join(". ");
     }
 
     return fallback;
 }
 
 
-function updateCourseLinks(spaceId) {
+function getAccessLabel(
+    accessMode
+) {
+    return accessMode ===
+        "public"
+        ? "Публичный курс"
+        : "Приватный курс";
+}
+
+
+function updateCourseLinks(
+    spaceId
+) {
     const chatTab =
-        document.getElementById("chat-tab");
+        document.getElementById(
+            "chat-tab"
+        );
 
     const materialsTab =
-        document.getElementById("materials-tab");
+        document.getElementById(
+            "materials-tab"
+        );
 
-    chatTab.href =
-        `chat.html?space_id=${encodeURIComponent(spaceId)}`;
 
-    materialsTab.href =
-        `materials.html?space_id=${encodeURIComponent(spaceId)}`;
+    if (chatTab) {
+        chatTab.href =
+            `chat.html?space_id=${encodeURIComponent(spaceId)}`;
+    }
+
+
+    if (materialsTab) {
+        materialsTab.href =
+            `materials.html?space_id=${encodeURIComponent(spaceId)}`;
+    }
+}
+
+
+function renderCourseInfo(course) {
+    const title =
+        document.getElementById(
+            "course-title"
+        );
+
+    const access =
+        document.getElementById(
+            "course-access"
+        );
+
+    const owner =
+        document.getElementById(
+            "course-owner"
+        );
+
+    const currentUserId =
+        getCurrentUserId();
+
+
+    if (title) {
+        title.textContent =
+            course.name;
+    }
+
+
+    if (access) {
+        access.textContent =
+            getAccessLabel(
+                course.access_mode
+            );
+
+        access.classList.toggle(
+            "public",
+            course.access_mode ===
+                "public"
+        );
+    }
+
+
+    if (owner) {
+        const isOwner =
+            course.owner_id ===
+            currentUserId;
+
+        owner.hidden =
+            !isOwner;
+    }
+
+
+    document.title =
+        `${course.name} — NSU RAG`;
 }
 
 
 async function loadCourse() {
-    const spaceId = getSpaceId();
-    const token = getAccessToken();
+    const spaceId =
+        getSpaceId();
+
+    const token =
+        getAccessToken();
 
     const title =
-        document.getElementById("course-title");
+        document.getElementById(
+            "course-title"
+        );
 
     const error =
-        document.getElementById("course-error");
+        document.getElementById(
+            "course-error"
+        );
 
 
     if (!token) {
-        window.location.href = "../login.html";
+        window.location.href =
+            "../login.html";
+
         return;
     }
 
 
     if (!spaceId) {
-        title.textContent = "Курс не выбран";
+        if (title) {
+            title.textContent =
+                "Курс не выбран";
+        }
 
-        error.textContent =
-            "Откройте курс из списка курсов.";
+        if (error) {
+            error.textContent =
+                "Откройте курс из списка курсов.";
+        }
 
         return;
     }
 
 
-    updateCourseLinks(spaceId);
+    updateCourseLinks(
+        spaceId
+    );
 
 
     try {
-        const response = await fetch(
-            `/spaces/${encodeURIComponent(spaceId)}`,
-            {
-                headers: {
-                    "Authorization": `Bearer ${token}`
+        const response =
+            await fetch(
+                `/spaces/${encodeURIComponent(spaceId)}`,
+                {
+                    headers: {
+                        "Authorization":
+                            `Bearer ${token}`
+                    }
                 }
-            }
-        );
+            );
 
 
-        if (response.status === 401) {
-            localStorage.removeItem("access_token");
-            localStorage.removeItem("token_type");
-            localStorage.removeItem("user_id");
+        if (
+            response.status ===
+            401
+        ) {
+            clearAuthData();
 
-            window.location.href = "../login.html";
+            window.location.href =
+                "../login.html";
+
             return;
         }
 
 
         const data =
-            await readCourseResponse(response);
+            await readCourseResponse(
+                response
+            );
 
 
         if (!response.ok) {
-            error.textContent =
-                getCourseErrorMessage(
-                    data,
-                    "Не удалось открыть курс."
-                );
+            if (title) {
+                title.textContent =
+                    "Курс";
+            }
 
-            title.textContent = "Курс";
+            if (error) {
+                error.textContent =
+                    getCourseErrorMessage(
+                        data,
+                        "Не удалось открыть курс."
+                    );
+            }
 
             return;
         }
 
 
-        title.textContent = data.name;
+        if (error) {
+            error.textContent = "";
+        }
 
-        document.title =
-            `${data.name} — NSU RAG`;
+
+        renderCourseInfo(
+            data
+        );
 
     } catch {
-        title.textContent = "Курс";
+        if (title) {
+            title.textContent =
+                "Курс";
+        }
 
-        error.textContent =
-            "Не удалось подключиться к серверу.";
+        if (error) {
+            error.textContent =
+                "Не удалось подключиться к серверу.";
+        }
     }
 }
 

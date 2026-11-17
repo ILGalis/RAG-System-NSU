@@ -1,0 +1,549 @@
+/* Скрытые элементы */
+
+.materials-card[hidden],
+.materials-state[hidden],
+.materials-list[hidden],
+.selected-file[hidden] {
+    display: none;
+}
+
+
+/* Материалы курса */
+
+.materials-layout {
+    width: 100%;
+    max-width: 1180px;
+
+    display: grid;
+    grid-template-columns:
+        minmax(320px, 0.85fr)
+        minmax(420px, 1.15fr);
+
+    gap: 20px;
+
+    align-items: start;
+}
+
+
+.materials-card {
+    padding: 26px;
+
+    background:
+        rgba(255, 255, 255, 0.97);
+
+    border:
+        1px solid #d6e0d2;
+
+    border-radius: 16px;
+
+    box-shadow:
+        0 4px 14px
+        rgba(44, 66, 40, 0.04);
+}
+
+
+.materials-heading {
+    margin-bottom: 21px;
+}
+
+
+.materials-heading h2 {
+    margin: 0 0 6px;
+
+    color:
+        var(--color-text);
+
+    font-size: 21px;
+    line-height: 1.3;
+}
+
+
+.materials-heading p {
+    margin: 0;
+
+    color:
+        var(--color-text-secondary);
+
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+
+/* Выбор файла */
+
+.file-drop-zone {
+    min-height: 190px;
+
+    padding: 28px 22px;
+
+    display: flex;
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 7px;
+
+    background:
+        #f7faf5;
+
+    border:
+        1px dashed #abc4a4;
+
+    border-radius: 14px;
+
+    color:
+        #4f6255;
+
+    text-align: center;
+
+    cursor: pointer;
+
+    transition:
+        background-color 0.2s,
+        border-color 0.2s,
+        box-shadow 0.2s;
+}
+
+
+.file-drop-zone:hover,
+.file-drop-zone.drag-active {
+    background:
+        #eff6ec;
+
+    border-color:
+        var(--color-primary);
+
+    box-shadow:
+        0 0 0 3px
+        rgba(85, 157, 69, 0.08);
+}
+
+
+.file-drop-zone svg {
+    width: 36px;
+    height: 36px;
+
+    margin-bottom: 6px;
+
+    fill: none;
+
+    stroke:
+        var(--color-primary-hover);
+
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+
+.file-drop-zone strong {
+    color:
+        var(--color-text);
+
+    font-size: 15px;
+}
+
+
+.file-drop-zone span {
+    color:
+        var(--color-text-secondary);
+
+    font-size: 13px;
+}
+
+
+.file-drop-zone small {
+    margin-top: 4px;
+
+    color: #748078;
+
+    font-size: 12px;
+}
+
+
+.file-input {
+    position: absolute;
+
+    width: 1px;
+    height: 1px;
+
+    padding: 0;
+
+    overflow: hidden;
+
+    clip:
+        rect(0, 0, 0, 0);
+
+    white-space: nowrap;
+
+    border: 0;
+}
+
+
+/* Выбранный файл */
+
+.selected-file {
+    margin-top: 14px;
+    padding: 12px 13px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 14px;
+
+    background:
+        #f3f7f1;
+
+    border:
+        1px solid #d3e1cf;
+
+    border-radius: 10px;
+}
+
+
+.selected-file-info {
+    min-width: 0;
+
+    display: flex;
+    align-items: center;
+
+    gap: 11px;
+}
+
+
+.selected-file-info svg {
+    width: 23px;
+    height: 23px;
+
+    flex-shrink: 0;
+
+    fill: none;
+
+    stroke:
+        var(--color-primary-hover);
+
+    stroke-width: 1.7;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+
+.selected-file-info div {
+    min-width: 0;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 2px;
+}
+
+
+.selected-file-info strong {
+    overflow: hidden;
+
+    color:
+        var(--color-text);
+
+    font-size: 13px;
+    font-weight: 600;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+
+.selected-file-info span {
+    color:
+        var(--color-text-secondary);
+
+    font-size: 12px;
+}
+
+
+.selected-file-remove {
+    width: 30px;
+    height: 30px;
+
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 0;
+    border-radius: 8px;
+
+    background:
+        transparent;
+
+    color: #68756d;
+
+    font-size: 22px;
+    line-height: 1;
+
+    cursor: pointer;
+
+    transition:
+        background-color 0.2s,
+        color 0.2s;
+}
+
+
+.selected-file-remove:hover {
+    background:
+        #e4ebe1;
+
+    color:
+        var(--color-text);
+}
+
+
+.materials-message {
+    margin:
+        12px 0 0;
+}
+
+
+.materials-upload-button {
+    width: 100%;
+
+    margin-top: 16px;
+
+    border: 0;
+}
+
+
+/* Список материалов */
+
+.materials-list-card {
+    min-height: 350px;
+}
+
+
+.materials-list {
+    display: flex;
+    flex-direction: column;
+
+    gap: 10px;
+}
+
+
+.material-item {
+    padding: 14px 15px;
+
+    display: flex;
+    align-items: center;
+
+    gap: 13px;
+
+    border:
+        1px solid #dce4d9;
+
+    border-radius: 11px;
+
+    background:
+        #ffffff;
+}
+
+
+.material-item-icon {
+    width: 40px;
+    height: 40px;
+
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background:
+        var(--color-primary-light);
+
+    border-radius: 10px;
+
+    color:
+        var(--color-primary-hover);
+}
+
+
+.material-item-icon svg {
+    width: 21px;
+    height: 21px;
+
+    fill: none;
+
+    stroke: currentColor;
+
+    stroke-width: 1.7;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+
+.material-item-body {
+    min-width: 0;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 5px;
+}
+
+
+.material-item-name {
+    overflow: hidden;
+
+    color:
+        var(--color-text);
+
+    font-size: 14px;
+    font-weight: 600;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+
+.material-item-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+
+    gap: 8px;
+
+    color:
+        var(--color-text-secondary);
+
+    font-size: 12px;
+}
+
+
+.material-status {
+    padding:
+        3px 7px;
+
+    background:
+        #eef2ed;
+
+    border-radius: 6px;
+}
+
+
+.material-status[data-status="ready"],
+.material-status[data-status="completed"],
+.material-status[data-status="indexed"] {
+    background:
+        var(--color-primary-light);
+
+    color:
+        var(--color-primary-hover);
+}
+
+
+.material-status[data-status="failed"],
+.material-status[data-status="error"] {
+    background:
+        #f8eaea;
+
+    color:
+        var(--color-error);
+}
+
+
+/* Состояния */
+
+.materials-state {
+    min-height: 245px;
+
+    padding: 30px;
+
+    display: flex;
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 8px;
+
+    background: #fafcf9;
+
+    border:
+        1px dashed #ccd9c8;
+
+    border-radius: 13px;
+
+    text-align: center;
+}
+
+
+.materials-state svg {
+    width: 38px;
+    height: 38px;
+
+    margin-bottom: 5px;
+
+    fill: none;
+
+    stroke: #718178;
+
+    stroke-width: 1.7;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+
+.materials-state strong {
+    color:
+        var(--color-text);
+
+    font-size: 15px;
+}
+
+
+.materials-state span {
+    max-width: 390px;
+
+    color:
+        var(--color-text-secondary);
+
+    font-size: 13px;
+    line-height: 1.45;
+}
+
+
+.materials-state-error {
+    color:
+        var(--color-error);
+}
+
+
+/* Загрузка */
+
+.materials-loader {
+    width: 28px;
+    height: 28px;
+
+    margin-bottom: 7px;
+
+    border:
+        3px solid #dae5d7;
+
+    border-top-color:
+        var(--color-primary);
+
+    border-radius: 50%;
+
+    animation:
+        materials-spin
+        0.8s linear infinite;
+}
+
+
+@keyframes materials-spin {
+    to {
+        transform:
+            rotate(360deg);
+    }
+}

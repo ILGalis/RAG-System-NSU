@@ -1,77 +1,53 @@
-const MOCK_USER_ID = 1;
-
-const MOCK_COURSES = [
-    {
-        id: 1,
-        name: "Математический анализ",
-        owner_id: 1,
-        access_mode: "public",
-        relation: "owned"
-    },
-    {
-        id: 2,
-        name: "Алгоритмы и структуры данных",
-        owner_id: 1,
-        access_mode: "private",
-        relation: "owned"
-    },
-    {
-        id: 3,
-        name: "Основы машинного обучения",
-        owner_id: 2,
-        access_mode: "public",
-        relation: "joined"
-    },
-    {
-        id: 4,
-        name: "Базы данных",
-        owner_id: 3,
-        access_mode: "private",
-        relation: "joined"
-    },
-    {
-        id: 5,
-        name: "Линейная алгебра",
-        owner_id: 4,
-        access_mode: "public",
-        relation: null
-    },
-    {
-        id: 6,
-        name: "Компьютерные сети",
-        owner_id: 5,
-        access_mode: "public",
-        relation: null
-    }
-];
-
-
 let allCourses = [];
 
 
-/* Тестовый режим */
+/* Авторизация */
 
-function getCurrentUserId() {
-    return MOCK_USER_ID;
+function getAccessToken() {
+    return localStorage.getItem(
+        "access_token"
+    );
 }
 
 
-async function loadCourses() {
-    return MOCK_COURSES;
+function clearAuthData() {
+    localStorage.removeItem(
+        "access_token"
+    );
+
+    localStorage.removeItem(
+        "token_type"
+    );
+
+    localStorage.removeItem(
+        "user_id"
+    );
+
+    localStorage.removeItem(
+        "user_role"
+    );
+
+    localStorage.removeItem(
+        "user_email"
+    );
+
+    localStorage.removeItem(
+        "user_first_name"
+    );
+
+    localStorage.removeItem(
+        "user_last_name"
+    );
 }
 
 
-/* Backend режим
-
-function getCurrentUserId() {
-    const value =
-        Number(localStorage.getItem("user_id"));
-
-    return Number.isFinite(value)
-        ? value
-        : null;
+function redirectToLogin() {
+    window.location.href =
+        "login.html";
 }
 
+
+/* Ответы API */
 
 async function readResponse(response) {
     try {
@@ -82,14 +58,31 @@ async function readResponse(response) {
 }
 
 
-function getErrorMessage(data, fallback) {
+function getErrorMessage(
+    data,
+    fallback
+) {
     if (data?.error?.message) {
         return data.error.message;
     }
 
-    if (Array.isArray(data?.detail)) {
+    if (
+        typeof data?.detail ===
+        "string"
+    ) {
+        return data.detail;
+    }
+
+    if (
+        Array.isArray(
+            data?.detail
+        )
+    ) {
         return data.detail
-            .map((item) => item.msg)
+            .map(
+                (item) =>
+                    item.msg
+            )
             .filter(Boolean)
             .join(". ");
     }
@@ -98,34 +91,125 @@ function getErrorMessage(data, fallback) {
 }
 
 
-async function loadCourses() {
+/* Текущий пользователь */
+
+async function loadCurrentUser() {
     const token =
-        localStorage.getItem("access_token");
+        getAccessToken();
 
     if (!token) {
-        window.location.href = "login.html";
+        redirectToLogin();
 
-        return [];
+        return null;
     }
 
-    const response = await fetch("/spaces", {
-        headers: {
-            "Authorization": `Bearer ${token}`
-        }
-    });
+
+    const response =
+        await fetch(
+            "/auth/me",
+            {
+                headers: {
+                    "Authorization":
+                        `Bearer ${token}`
+                }
+            }
+        );
+
 
     if (response.status === 401) {
-        localStorage.removeItem("access_token");
-        localStorage.removeItem("token_type");
-        localStorage.removeItem("user_id");
+        clearAuthData();
 
-        window.location.href = "login.html";
+        redirectToLogin();
+
+        return null;
+    }
+
+
+    const data =
+        await readResponse(
+            response
+        );
+
+
+    if (!response.ok) {
+        throw new Error(
+            getErrorMessage(
+                data,
+                "Не удалось получить данные пользователя."
+            )
+        );
+    }
+
+
+    localStorage.setItem(
+        "user_id",
+        String(data.id)
+    );
+
+    localStorage.setItem(
+        "user_role",
+        data.role ?? ""
+    );
+
+    localStorage.setItem(
+        "user_email",
+        data.email ?? ""
+    );
+
+    localStorage.setItem(
+        "user_first_name",
+        data.first_name ?? ""
+    );
+
+    localStorage.setItem(
+        "user_last_name",
+        data.last_name ?? ""
+    );
+
+
+    return data;
+}
+
+
+/* Курсы */
+
+async function loadCourses() {
+    const token =
+        getAccessToken();
+
+    if (!token) {
+        redirectToLogin();
 
         return [];
     }
 
+
+    const response =
+        await fetch(
+            "/spaces",
+            {
+                headers: {
+                    "Authorization":
+                        `Bearer ${token}`
+                }
+            }
+        );
+
+
+    if (response.status === 401) {
+        clearAuthData();
+
+        redirectToLogin();
+
+        return [];
+    }
+
+
     const data =
-        await readResponse(response);
+        await readResponse(
+            response
+        );
+
 
     if (!response.ok) {
         throw new Error(
@@ -136,16 +220,18 @@ async function loadCourses() {
         );
     }
 
+
     return Array.isArray(data)
         ? data
         : [];
 }
 
-*/
 
+/* Карточка курса */
 
 function getAccessLabel(course) {
-    return course.access_mode === "public"
+    return course.access_mode ===
+        "public"
         ? "Публичный курс"
         : "Приватный курс";
 }
@@ -156,57 +242,87 @@ function createCourseCard(
     currentUserId
 ) {
     const card =
-        document.createElement("a");
+        document.createElement(
+            "a"
+        );
 
-    card.className = "course-card";
+    card.className =
+        "course-card";
 
     card.href =
         `course/chat.html?space_id=${encodeURIComponent(course.id)}`;
 
 
     const header =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
 
     header.className =
         "course-card-header";
 
 
     const title =
-        document.createElement("h2");
+        document.createElement(
+            "h2"
+        );
 
     title.textContent =
         course.name;
 
 
-    header.append(title);
+    header.append(
+        title
+    );
 
 
     const meta =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
 
     meta.className =
         "course-card-meta";
 
 
     const access =
-        document.createElement("span");
+        document.createElement(
+            "span"
+        );
 
     access.className =
         "course-access";
 
-    if (course.access_mode === "public") {
-        access.classList.add("public");
+
+    if (
+        course.access_mode ===
+        "public"
+    ) {
+        access.classList.add(
+            "public"
+        );
     }
 
+
     access.textContent =
-        getAccessLabel(course);
+        getAccessLabel(
+            course
+        );
 
-    meta.append(access);
+
+    meta.append(
+        access
+    );
 
 
-    if (course.owner_id === currentUserId) {
+    if (
+        course.owner_id ===
+        currentUserId
+    ) {
         const owner =
-            document.createElement("span");
+            document.createElement(
+                "span"
+            );
 
         owner.className =
             "course-owner-badge";
@@ -214,7 +330,9 @@ function createCourseCard(
         owner.textContent =
             "Вы владелец";
 
-        meta.append(owner);
+        meta.append(
+            owner
+        );
     }
 
 
@@ -222,6 +340,7 @@ function createCourseCard(
         header,
         meta
     );
+
 
     return card;
 }
@@ -234,22 +353,28 @@ function renderCourseList(
 ) {
     container.replaceChildren();
 
-    courses.forEach((course) => {
-        container.append(
-            createCourseCard(
-                course,
-                currentUserId
-            )
-        );
-    });
+
+    courses.forEach(
+        (course) => {
+            container.append(
+                createCourseCard(
+                    course,
+                    currentUserId
+                )
+            );
+        }
+    );
 }
 
+
+/* Ошибки */
 
 function showPageError(message) {
     const errorElement =
         document.getElementById(
             "courses-error"
         );
+
 
     if (errorElement) {
         errorElement.textContent =
@@ -258,11 +383,19 @@ function showPageError(message) {
 }
 
 
-function initCoursesPage() {
+function clearPageError() {
+    showPageError("");
+}
+
+
+/* Все курсы */
+
+async function initCoursesPage() {
     const grid =
         document.getElementById(
             "courses-grid"
         );
+
 
     if (!grid) {
         return;
@@ -274,70 +407,146 @@ function initCoursesPage() {
             "course-search"
         );
 
+
     const empty =
         document.getElementById(
             "courses-empty"
         );
 
-    const currentUserId =
-        getCurrentUserId();
+
+    clearPageError();
 
 
-    loadCourses()
-        .then((courses) => {
-            allCourses = courses;
-
-            renderCourseList(
-                grid,
-                allCourses,
-                currentUserId
-            );
-
-            empty.hidden =
-                allCourses.length !== 0;
-        })
-        .catch((error) => {
-            showPageError(
-                error.message
-            );
-        });
+    try {
+        const [
+            currentUser,
+            courses
+        ] =
+            await Promise.all([
+                loadCurrentUser(),
+                loadCourses()
+            ]);
 
 
-    searchInput.addEventListener(
-        "input",
-        () => {
-            const query =
-                searchInput
-                    .value
-                    .trim()
-                    .toLowerCase();
-
-            const filtered =
-                allCourses.filter(
-                    (course) =>
-                        course.name
-                            .toLowerCase()
-                            .includes(query)
-                );
-
-            renderCourseList(
-                grid,
-                filtered,
-                currentUserId
-            );
-
-            empty.hidden =
-                filtered.length !== 0;
+        if (!currentUser) {
+            return;
         }
+
+
+        allCourses =
+            courses.filter(
+                (course) =>
+                    course.access_mode ===
+                    "public"
+            );
+
+
+        renderCourseList(
+            grid,
+            allCourses,
+            currentUser.id
+        );
+
+
+        if (empty) {
+            empty.hidden =
+                allCourses.length !==
+                0;
+        }
+
+
+        if (searchInput) {
+            searchInput.addEventListener(
+                "input",
+                () => {
+                    const query =
+                        searchInput.value
+                            .trim()
+                            .toLowerCase();
+
+
+                    const filtered =
+                        allCourses.filter(
+                            (course) =>
+                                course.name
+                                    .toLowerCase()
+                                    .includes(
+                                        query
+                                    )
+                        );
+
+
+                    renderCourseList(
+                        grid,
+                        filtered,
+                        currentUser.id
+                    );
+
+
+                    if (empty) {
+                        empty.hidden =
+                            filtered.length !==
+                            0;
+                    }
+                }
+            );
+        }
+
+    } catch (error) {
+        console.error(
+            "Ошибка загрузки курсов:",
+            error
+        );
+
+
+        showPageError(
+            error.message
+        );
+
+
+        if (empty) {
+            empty.hidden =
+                true;
+        }
+    }
+}
+
+
+/* Мои курсы */
+
+function isJoinedCourse(
+    course,
+    currentUserId
+) {
+    if (
+        course.owner_id ===
+        currentUserId
+    ) {
+        return true;
+    }
+
+
+    if (
+        typeof course.is_member ===
+        "boolean"
+    ) {
+        return course.is_member;
+    }
+
+
+    return (
+        course.access_mode ===
+        "private"
     );
 }
 
 
-function initMyCoursesPage() {
+async function initMyCoursesPage() {
     const ownedGrid =
         document.getElementById(
             "owned-grid"
         );
+
 
     if (!ownedGrid) {
         return;
@@ -349,101 +558,138 @@ function initMyCoursesPage() {
             "joined-grid"
         );
 
+
     const ownedEmpty =
         document.getElementById(
             "owned-empty"
         );
+
 
     const joinedEmpty =
         document.getElementById(
             "joined-empty"
         );
 
+
     const ownedCount =
         document.getElementById(
             "owned-count"
         );
+
 
     const joinedCount =
         document.getElementById(
             "joined-count"
         );
 
-    const currentUserId =
-        getCurrentUserId();
+
+    clearPageError();
 
 
-    loadCourses()
-        .then((courses) => {
-
-            const ownedCourses =
-                courses.filter(
-                    (course) =>
-                        course.relation === "owned"
-                );
-
-
-            const joinedCourses =
-                courses.filter(
-                    (course) =>
-                        course.relation === "joined"
-                );
+    try {
+        const [
+            currentUser,
+            courses
+        ] =
+            await Promise.all([
+                loadCurrentUser(),
+                loadCourses()
+            ]);
 
 
-            /* Backend режим
-
-            const ownedCourses =
-                courses.filter(
-                    (course) =>
-                        course.owner_id === currentUserId
-                );
+        if (!currentUser) {
+            return;
+        }
 
 
-            const joinedCourses =
-                courses.filter(
-                    (course) =>
-                        course.owner_id !== currentUserId &&
-                        course.access_mode === "private"
-                );
-
-            */
+        const currentUserId =
+            currentUser.id;
 
 
-            renderCourseList(
-                ownedGrid,
-                ownedCourses,
-                currentUserId
-            );
-
-            renderCourseList(
-                joinedGrid,
-                joinedCourses,
-                currentUserId
+        const ownedCourses =
+            courses.filter(
+                (course) =>
+                    course.owner_id ===
+                    currentUserId
             );
 
 
+        const joinedCourses =
+            courses.filter(
+                (course) =>
+                    isJoinedCourse(
+                        course,
+                        currentUserId
+                    )
+            );
+
+
+        renderCourseList(
+            ownedGrid,
+            ownedCourses,
+            currentUserId
+        );
+
+
+        renderCourseList(
+            joinedGrid,
+            joinedCourses,
+            currentUserId
+        );
+
+
+        if (ownedCount) {
             ownedCount.textContent =
                 String(
                     ownedCourses.length
                 );
+        }
 
+
+        if (joinedCount) {
             joinedCount.textContent =
                 String(
                     joinedCourses.length
                 );
+        }
 
 
+        if (ownedEmpty) {
             ownedEmpty.hidden =
-                ownedCourses.length !== 0;
+                ownedCourses.length !==
+                0;
+        }
 
+
+        if (joinedEmpty) {
             joinedEmpty.hidden =
-                joinedCourses.length !== 0;
-        })
-        .catch((error) => {
-            showPageError(
-                error.message
-            );
-        });
+                joinedCourses.length !==
+                0;
+        }
+
+    } catch (error) {
+        console.error(
+            "Ошибка загрузки моих курсов:",
+            error
+        );
+
+
+        showPageError(
+            error.message
+        );
+
+
+        if (ownedEmpty) {
+            ownedEmpty.hidden =
+                true;
+        }
+
+
+        if (joinedEmpty) {
+            joinedEmpty.hidden =
+                true;
+        }
+    }
 
 
     const tabs =
@@ -451,49 +697,72 @@ function initMyCoursesPage() {
             ".my-courses-tab"
         );
 
+
     const contents =
         document.querySelectorAll(
             ".my-courses-content"
         );
 
 
-    tabs.forEach((tab) => {
-        tab.addEventListener(
-            "click",
-            () => {
-
-                tabs.forEach(
-                    (item) =>
-                        item.classList.remove(
-                            "active"
-                        )
-                );
-
-                contents.forEach(
-                    (content) =>
-                        content.classList.remove(
-                            "active"
-                        )
-                );
+    tabs.forEach(
+        (tab) => {
+            tab.addEventListener(
+                "click",
+                () => {
+                    tabs.forEach(
+                        (item) => {
+                            item.classList.remove(
+                                "active"
+                            );
+                        }
+                    );
 
 
-                tab.classList.add(
-                    "active"
-                );
+                    contents.forEach(
+                        (content) => {
+                            content.classList.remove(
+                                "active"
+                            );
+                        }
+                    );
 
 
-                document
-                    .getElementById(
-                        tab.dataset.tab
-                    )
-                    .classList.add(
+                    tab.classList.add(
                         "active"
                     );
-            }
-        );
-    });
+
+
+                    const target =
+                        document.getElementById(
+                            tab.dataset.tab
+                        );
+
+
+                    if (target) {
+                        target.classList.add(
+                            "active"
+                        );
+                    }
+                }
+            );
+        }
+    );
 }
 
+
+/* Отладка */
+
+window.initCoursesPage =
+    initCoursesPage;
+
+window.initMyCoursesPage =
+    initMyCoursesPage;
+
+window.loadCourses =
+    loadCourses;
+
+
+/* Запуск */
 
 document.addEventListener(
     "DOMContentLoaded",

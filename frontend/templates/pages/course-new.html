@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Создать курс — NSU RAG</title>
+
+    <link
+        rel="stylesheet"
+        href="/static/css/tokens.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="/static/css/base.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="/static/css/layout.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="/static/css/components/card.css"
+    >
+
+    <script
+        src="/static/js/course-create.js"
+        defer
+    ></script>
+</head>
+
+<body>
+
+<div class="app-layout">
+
+    <aside class="sidebar">
+
+        <a
+            href="courses.html"
+            class="sidebar-logo"
+        >
+            <span class="sidebar-logo-icon">
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+            </span>
+
+            <span>NSU RAG</span>
+        </a>
+
+
+        <nav class="sidebar-nav">
+
+            <a
+                href="courses.html"
+                class="sidebar-link"
+            >
+                <svg
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                >
+                    <rect
+                        x="3"
+                        y="3"
+                        width="7"
+                        height="7"
+                        rx="1"
+                    ></rect>
+
+                    <rect
+                        x="14"
+                        y="3"
+                        width="7"
+                        height="7"
+                        rx="1"
+                    ></rect>
+
+                    <rect
+                        x="3"
+                        y="14"
+                        width="7"
+                        height="7"
+                        rx="1"
+                    ></rect>
+
+                    <rect
+                        x="14"
+                        y="14"
+                        width="7"
+                        height="7"
+                        rx="1"
+                    ></rect>
+                </svg>
+
+                <span>Все курсы</span>
+            </a>
+
+
+            <a
+                href="my-courses.html"
+                class="sidebar-link"
+            >
+                <svg
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                >
+                    <path
+                        d="M12 3.5L14.7 8.97L20.74 9.85L16.37 14.11L17.4 20.13L12 17.29L6.6 20.13L7.63 14.11L3.26 9.85L9.3 8.97L12 3.5Z"
+                    ></path>
+                </svg>
+
+                <span>Мои курсы</span>
+            </a>
+
+
+            <a
+                href="profile.html"
+                class="sidebar-link"
+            >
+                <svg
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                >
+                    <circle
+                        cx="12"
+                        cy="8"
+                        r="4"
+                    ></circle>
+
+                    <path
+                        d="M4.5 21a7.5 7.5 0 0 1 15 0"
+                    ></path>
+                </svg>
+
+                <span>Профиль</span>
+            </a>
+
+        </nav>
+
+    </aside>
+
+
+    <main class="app-content">
+
+        <a
+            href="my-courses.html"
+            class="course-back"
+        >
+            <svg
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+            >
+                <path
+                    d="M15 18L9 12L15 6"
+                ></path>
+            </svg>
+
+            Мои курсы
+        </a>
+
+
+        <header
+            class="page-header course-create-header"
+        >
+            <div>
+                <h1>Создание курса</h1>
+
+                <p>
+                    Укажите название курса и выберите уровень доступа.
+                </p>
+            </div>
+        </header>
+
+
+        <section class="course-form-card">
+
+            <form
+                id="course-create-form"
+                class="course-create-form"
+            >
+
+                <div class="app-form-field">
+
+                    <label for="course-name">
+                        Название курса
+                    </label>
+
+                    <input
+                        id="course-name"
+                        name="name"
+                        type="text"
+                        maxlength="200"
+                        placeholder="Например, Математический анализ"
+                        autocomplete="off"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="app-form-field">
+
+                    <label for="access-mode">
+                        Доступ к курсу
+                    </label>
+
+                    <select
+                        id="access-mode"
+                        name="access_mode"
+                    >
+                        <option value="private">
+                            Приватный курс
+                        </option>
+
+                        <option value="public">
+                            Публичный курс
+                        </option>
+                    </select>
+
+                    <p class="field-help">
+                        Публичный курс доступен всем авторизованным пользователям.
+                        Приватный — только владельцу и участникам.
+                    </p>
+
+                </div>
+
+
+                <p
+                    id="course-create-error"
+                    class="page-error course-form-error"
+                    role="alert"
+                ></p>
+
+
+                <div class="course-form-actions">
+
+                    <a
+                        href="my-courses.html"
+                        class="secondary-action"
+                    >
+                        Отмена
+                    </a>
+
+                    <button
+                        type="submit"
+                        class="primary-action course-submit"
+                    >
+                        Создать курс
+                    </button>
+
+                </div>
+
+            </form>
+
+        </section>
+
+    </main>
+
+</div>
+
+</body>
+
+</html>

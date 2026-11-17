@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Материалы курса — NSU RAG</title>
+
+    <link
+        rel="stylesheet"
+        href="/static/css/tokens.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="/static/css/base.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="/static/css/layout.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="/static/css/components/card.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="/static/css/components/materials.css"
+    >
+
+    <script
+        src="/static/js/course.js"
+        defer
+    ></script>
+
+    <script
+        src="/static/js/materials.js"
+        defer
+    ></script>
+</head>
+
+<body>
+
+<div class="app-layout">
+
+    <aside class="sidebar">
+
+        <a
+            href="../courses.html"
+            class="sidebar-logo"
+        >
+            <span class="sidebar-logo-icon">
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+            </span>
+
+            <span>NSU RAG</span>
+        </a>
+
+
+        <nav class="sidebar-nav">
+
+            <a
+                href="../courses.html"
+                class="sidebar-link"
+            >
+                <svg
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                >
+                    <rect
+                        x="3"
+                        y="3"
+                        width="7"
+                        height="7"
+                        rx="1"
+                    ></rect>
+
+                    <rect
+                        x="14"
+                        y="3"
+                        width="7"
+                        height="7"
+                        rx="1"
+                    ></rect>
+
+                    <rect
+                        x="3"
+                        y="14"
+                        width="7"
+                        height="7"
+                        rx="1"
+                    ></rect>
+
+                    <rect
+                        x="14"
+                        y="14"
+                        width="7"
+                        height="7"
+                        rx="1"
+                    ></rect>
+                </svg>
+
+                <span>Все курсы</span>
+            </a>
+
+
+            <a
+                href="../my-courses.html"
+                class="sidebar-link"
+            >
+                <svg
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                >
+                    <path
+                        d="M12 3.5L14.7 8.97L20.74 9.85L16.37 14.11L17.4 20.13L12 17.29L6.6 20.13L7.63 14.11L3.26 9.85L9.3 8.97L12 3.5Z"
+                    ></path>
+                </svg>
+
+                <span>Мои курсы</span>
+            </a>
+
+
+            <a
+                href="../profile.html"
+                class="sidebar-link"
+            >
+                <svg
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                >
+                    <circle
+                        cx="12"
+                        cy="8"
+                        r="4"
+                    ></circle>
+
+                    <path
+                        d="M4.5 21a7.5 7.5 0 0 1 15 0"
+                    ></path>
+                </svg>
+
+                <span>Профиль</span>
+            </a>
+
+        </nav>
+
+    </aside>
+
+
+    <main class="app-content">
+
+        <a
+            href="../courses.html"
+            class="course-back"
+        >
+            <svg
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+            >
+                <path
+                    d="M15 18L9 12L15 6"
+                ></path>
+            </svg>
+
+            Все курсы
+        </a>
+
+
+        <header
+            class="page-header course-workspace-header"
+        >
+
+            <div>
+
+                <h1 id="course-title">
+                    Загрузка курса...
+                </h1>
+
+
+                <div class="course-workspace-meta">
+
+                    <span
+                        id="course-access"
+                        class="course-access"
+                    >
+                        Загрузка...
+                    </span>
+
+
+                    <span
+                        id="course-owner"
+                        class="course-owner-badge"
+                        hidden
+                    >
+                        Вы владелец
+                    </span>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <nav class="workspace-tabs">
+
+            <a
+                id="chat-tab"
+                href="chat.html"
+                class="workspace-tab"
+            >
+                AI-помощник
+            </a>
+
+
+            <a
+                id="materials-tab"
+                href="materials.html"
+                class="workspace-tab active"
+            >
+                Материалы курса
+            </a>
+
+        </nav>
+
+
+        <p
+            id="course-error"
+            class="page-error"
+            role="alert"
+        ></p>
+
+
+        <section class="materials-layout">
+
+            <article
+                id="materials-upload-card"
+                class="materials-card"
+                hidden
+            >
+
+                <div class="materials-heading">
+
+                    <h2>
+                        Загрузить материал
+                    </h2>
+
+                    <p>
+                        Добавьте документ, который будет использоваться
+                        в материалах этого курса.
+                    </p>
+
+                </div>
+
+
+                <form
+                    id="document-upload-form"
+                >
+
+                    <label
+                        id="file-drop-zone"
+                        for="document-file"
+                        class="file-drop-zone"
+                    >
+
+                        <svg
+                            viewBox="0 0 24 24"
+                            aria-hidden="true"
+                        >
+                            <path
+                                d="M12 16V4"
+                            ></path>
+
+                            <path
+                                d="M7 9L12 4L17 9"
+                            ></path>
+
+                            <path
+                                d="M5 20H19"
+                            ></path>
+                        </svg>
+
+
+                        <strong>
+                            Выберите документ
+                        </strong>
+
+
+                        <span>
+                            или перетащите его сюда
+                        </span>
+
+
+                        <small>
+                            PDF, DOCX или TXT
+                        </small>
+
+                    </label>
+
+
+                    <input
+                        id="document-file"
+                        name="file"
+                        class="file-input"
+                        type="file"
+                        accept=".pdf,.docx,.txt"
+                    >
+
+
+                    <div
+                        id="selected-file"
+                        class="selected-file"
+                        hidden
+                    >
+
+                        <div class="selected-file-info">
+
+                            <svg
+                                viewBox="0 0 24 24"
+                                aria-hidden="true"
+                            >
+                                <path
+                                    d="M14 2H6C4.9 2 4 2.9 4 4V20C4 21.1 4.9 22 6 22H18C19.1 22 20 21.1 20 20V8L14 2Z"
+                                ></path>
+
+                                <path
+                                    d="M14 2V8H20"
+                                ></path>
+                            </svg>
+
+
+                            <div>
+                                <strong
+                                    id="selected-file-name"
+                                ></strong>
+
+                                <span
+                                    id="selected-file-size"
+                                ></span>
+                            </div>
+
+                        </div>
+
+
+                        <button
+                            id="remove-selected-file"
+                            class="selected-file-remove"
+                            type="button"
+                            aria-label="Убрать выбранный файл"
+                        >
+                            ×
+                        </button>
+
+                    </div>
+
+
+                    <p
+                        id="upload-error"
+                        class="page-error materials-message"
+                        role="alert"
+                    ></p>
+
+
+                    <button
+                        id="document-upload-button"
+                        type="submit"
+                        class="primary-action materials-upload-button"
+                        disabled
+                    >
+                        Загрузить документ
+                    </button>
+
+                </form>
+
+            </article>
+
+
+            <article class="materials-card materials-list-card">
+
+                <div class="materials-heading">
+
+                    <h2>
+                        Материалы курса
+                    </h2>
+
+                    <p>
+                        Документы, добавленные в этот курс.
+                    </p>
+
+                </div>
+
+
+                <div
+                    id="materials-loading"
+                    class="materials-state"
+                >
+                    <div class="materials-loader"></div>
+
+                    <span>
+                        Загружаем материалы...
+                    </span>
+                </div>
+
+
+                <div
+                    id="materials-empty"
+                    class="materials-state"
+                    hidden
+                >
+
+                    <svg
+                        viewBox="0 0 24 24"
+                        aria-hidden="true"
+                    >
+                        <path
+                            d="M14 2H6C4.9 2 4 2.9 4 4V20C4 21.1 4.9 22 6 22H18C19.1 22 20 21.1 20 20V8L14 2Z"
+                        ></path>
+
+                        <path
+                            d="M14 2V8H20"
+                        ></path>
+                    </svg>
+
+
+                    <strong>
+                        Материалов пока нет
+                    </strong>
+
+
+                    <span>
+                        Загруженные документы появятся здесь.
+                    </span>
+
+                </div>
+
+
+                <div
+                    id="materials-unavailable"
+                    class="materials-state"
+                    hidden
+                >
+
+                    <svg
+                        viewBox="0 0 24 24"
+                        aria-hidden="true"
+                    >
+                        <path
+                            d="M14 2H6C4.9 2 4 2.9 4 4V20C4 21.1 4.9 22 6 22H18C19.1 22 20 21.1 20 20V8L14 2Z"
+                        ></path>
+
+                        <path
+                            d="M14 2V8H20"
+                        ></path>
+                    </svg>
+
+
+                    <strong>
+                        Материалы скоро будут доступны
+                    </strong>
+
+
+                    <span>
+                        Backend API документов пока не подключён.
+                    </span>
+
+                </div>
+
+
+                <div
+                    id="materials-error"
+                    class="materials-state materials-state-error"
+                    hidden
+                ></div>
+
+
+                <div
+                    id="materials-list"
+                    class="materials-list"
+                    hidden
+                ></div>
+
+            </article>
+
+        </section>
+
+    </main>
+
+</div>
+
+</body>
+
+</html>
