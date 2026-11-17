@@ -22,6 +22,7 @@ def create_space(
         name=data.name,
         owner_id=data.owner_id,
         access_mode=data.access_mode,
+        faculty = data.faculty,
     )
     db.add(space)
     db.flush()

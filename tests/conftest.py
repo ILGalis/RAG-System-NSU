@@ -62,7 +62,7 @@ def clean_db():
     with test_engine.begin() as conn:
         conn.execute(
             text(
-                "TRUNCATE email_verification_tokens, sessions, "
+                "TRUNCATE documents, email_verification_tokens, sessions, "
                 "space_members, rag_spaces, users "
                 "RESTART IDENTITY CASCADE"
             )

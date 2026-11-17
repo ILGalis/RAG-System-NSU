@@ -26,7 +26,7 @@ def test_list_spaces_requires_auth(client: TestClient):
 
 
 def test_list_spaces_only_own_and_public(client: TestClient, make_user):
-    a = make_user("a@g.nsu.ru")
+    a = make_user("a@g.nsu.ru",role = "teacher")
     b = make_user("b@g.nsu.ru")
 
     client.post("/spaces", headers=a["headers"],
@@ -83,7 +83,78 @@ def test_update_space_by_owner(client: TestClient, make_user):
 
 def test_delete_space_by_owner(client: TestClient, make_user):
     u = make_user()
-    sid = client.post("/spaces", headers=u["headers"],
+    sid = client.post("/spaces", headers=u["headers"],#faculty = "str",
                       json={"name": "To delete", "owner_id": 1, "access_mode": "private"}).json()["id"]
     assert client.delete(f"/spaces/{sid}", headers=u["headers"]).status_code == 204
     assert client.get(f"/spaces/{sid}", headers=u["headers"]).status_code == 404
+
+def test_create_space_with_faculty_and_owner(client, make_user):
+    u = make_user(
+        "a@g.nsu.ru",
+        first_name="Иван",
+        last_name="Иванов",
+        role="teacher",
+        #faculty = "something",
+    )
+    r = client.post(
+        "/spaces",
+        headers=u["headers"],
+        json={
+            "name": "матанчик 1 курс",
+            "faculty": "ММФ",
+            "owner_id": 1,
+            "access_mode": "private",
+        },
+    )
+    assert r.status_code == 201, r.text
+    body = r.json()
+    assert body["faculty"] == "ММФ"
+    assert body["owner"]["first_name"] == "Иван"
+    assert body["owner"]["last_name"] == "Иванов"
+    assert body["owner"]["email"] == "a@g.nsu.ru"
+
+
+def test_create_space_faculty_defaults_to_empty(client, make_user):
+    u = make_user()
+    r = client.post(
+        "/spaces",
+        headers=u["headers"],
+        json={"name": "Space", "owner_id": 1, "access_mode": "private"},
+    )
+    assert r.status_code == 201, r.text
+    assert r.json()["faculty"] == ""
+
+
+def test_list_spaces_includes_owner_info(client, make_user):
+    u = make_user(first_name="Пётр", last_name="Петров",role = "teacher")
+    client.post(
+        "/spaces",
+        headers=u["headers"],
+        json={
+            "name": "X",
+            "faculty": "ФФ",
+            "owner_id": 1,
+            "access_mode": "public",
+        },
+    )
+    # учитель, чтобы создать public
+    r = client.get("/spaces", headers=u["headers"])
+    assert r.status_code == 200, r.text
+    spaces = r.json()
+    assert spaces[0]["owner"]["first_name"] == "Пётр"
+    assert spaces[0]["faculty"] == "ФФ"
+
+def test_student_cannot_patch_space_to_public(client, make_user):
+    u = make_user(role="student")
+    sid = client.post(
+        "/spaces", headers=u["headers"],
+        json={"name": "S", "owner_id": 1, "access_mode": "private"},
+    ).json()["id"]
+
+    r = client.patch(
+        f"/spaces/{sid}",
+        headers=u["headers"],
+        json={"access_mode": "public"},
+    )
+    assert r.status_code == 403
+    assert r.json()["error"]["code"] == "public_requires_teacher"

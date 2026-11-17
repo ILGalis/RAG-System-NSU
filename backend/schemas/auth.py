@@ -24,3 +24,7 @@ class UserOut(BaseModel):
     first_name: str
     last_name: str
     role: Literal["teacher", "student"]
+# пока как по мне удаление небезопасное, если кто-то узнал твой пароль и этот кто-то
+# авторизован, то по идее может снести акк, пока над проверкой сессии думаю
+class DeleteAccountRequest(BaseModel):
+    password: str
