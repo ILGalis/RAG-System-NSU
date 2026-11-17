@@ -26,7 +26,7 @@ class LLMRateLimit(LLMError):
 
 
 class OpenRouterProvider:
-    model = "qwen/qwen3.5-plus-02-15"
+    model = "deepseek/deepseek-v4.1-flash"
 
     def __init__(self, client: httpx.Client, *, timeout: float = 30.0) -> None:
         self._api_key = os.getenv("OPENROUTER_API_KEY", "").strip()

@@ -71,7 +71,7 @@ def test_scoped_question_through_openrouter(retriever, openrouter):
         assert str(request.url) == "https://openrouter.ai/api/v1/chat/completions"
         assert request.headers["Authorization"] == "Bearer test-key"
         body = json.loads(request.content)
-        assert body["model"] == "qwen/qwen3.5-plus-02-15"
+        assert body["model"] == "deepseek/deepseek-v4.1-flash"
         assert body["reasoning"] == {"effort": "none"}
         assert body["provider"] == {"require_parameters": True}
         assert "enable_thinking" not in body
@@ -101,7 +101,7 @@ def test_scoped_question_through_openrouter(retriever, openrouter):
 
 def test_empty_space_skips_provider(retriever, openrouter):
     def unexpected(_):
-        pytest.fail("Empty space must not contact Qwen")
+        pytest.fail("Empty space must not contact OpenRouter")
 
     result = RAGService(retriever, openrouter(unexpected)).ask("Exam?", space_id="empty")
     assert (result.found, result.answer, result.sources) == (False, INSUFFICIENT_CONTEXT, ())
@@ -192,3 +192,13 @@ def test_openrouter_requires_its_own_key(monkeypatch):
     monkeypatch.delenv("OPENROUTER_API_KEY", raising=False)
     with httpx.Client() as client, pytest.raises(ValueError, match="OPENROUTER_API_KEY"):
         OpenRouterProvider(client)
+
+
+def test_whitespace_only_quote_mismatch_returns_original_text(retriever, openrouter):
+    provider = openrouter(lambda _: completion({
+        "found": True,
+        "answer": "Tuesday [S1].",
+        "sources": [{"ref": "S1", "quote": "on  Tuesday"}],
+    }))
+    result = RAGService(retriever, provider).ask("When is the exam?", space_id="physics")
+    assert result.sources[0].quote == "on Tuesday"

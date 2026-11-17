@@ -81,10 +81,24 @@ class RAGService:
             if not isinstance(citation, dict):
                 raise LLMError("Invalid source citation")
             ref, quote = citation.get("ref"), citation.get("quote")
-            if (not isinstance(ref, str) or ref not in excerpts or ref in sources
-                    or not isinstance(quote, str) or not quote.strip()
-                    or len(quote) > MAX_QUOTE_CHARS or quote not in excerpts[ref]):
-                raise LLMError("Source citation does not match a retrieved excerpt")
+            if not isinstance(ref, str) or ref not in excerpts:
+                raise LLMError("Unknown source citation reference")
+            if ref in sources:
+                raise LLMError("Duplicate source citation reference")
+            if not isinstance(quote, str) or not quote.strip():
+                raise LLMError("Missing source quote")
+            if len(quote) > MAX_QUOTE_CHARS:
+                raise LLMError("Source quote exceeds the character limit")
+            excerpt = excerpts[ref]
+            if quote not in excerpt:
+                # Recover the original text and preserve every non-whitespace character.
+                pattern = r"\s+".join(re.escape(part) for part in quote.split())
+                match = re.search(pattern, excerpt)
+                if match is None:
+                    raise LLMError("Source citation does not match a retrieved excerpt")
+                quote = match.group()
+                if len(quote) > MAX_QUOTE_CHARS:
+                    raise LLMError("Source quote exceeds the character limit")
             hit = by_ref[ref]
             chunk = hit.chunk
             sources[ref] = AnswerSource(
