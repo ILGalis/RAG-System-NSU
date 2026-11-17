@@ -31,6 +31,11 @@
         href="/static/css/components/card.css"
     >
 
+    <link
+        rel="stylesheet"
+        href="/static/css/components/materials.css"
+    >
+
     <script
         src="/static/js/course.js"
         defer
@@ -240,19 +245,22 @@
 
         <section class="materials-layout">
 
-            <div class="materials-upload-card">
+            <article
+                id="materials-upload-card"
+                class="materials-card"
+                hidden
+            >
 
-                <div class="materials-section-heading">
+                <div class="materials-heading">
 
-                    <div>
-                        <h2>
-                            Загрузить материал
-                        </h2>
+                    <h2>
+                        Загрузить материал
+                    </h2>
 
-                        <p>
-                            Добавьте учебный документ в выбранный курс.
-                        </p>
-                    </div>
+                    <p>
+                        Добавьте документ, который будет использоваться
+                        в материалах этого курса.
+                    </p>
 
                 </div>
 
@@ -262,10 +270,11 @@
                 >
 
                     <label
+                        id="file-drop-zone"
                         for="document-file"
                         class="file-drop-zone"
-                        id="file-drop-zone"
                     >
+
                         <svg
                             viewBox="0 0 24 24"
                             aria-hidden="true"
@@ -275,11 +284,11 @@
                             ></path>
 
                             <path
-                                d="M7 9l5-5 5 5"
+                                d="M7 9L12 4L17 9"
                             ></path>
 
                             <path
-                                d="M5 20h14"
+                                d="M5 20H19"
                             ></path>
                         </svg>
 
@@ -290,8 +299,13 @@
 
 
                         <span>
-                            Поддерживаемые форматы: PDF, DOCX, TXT
+                            или перетащите его сюда
                         </span>
+
+
+                        <small>
+                            PDF, DOCX или TXT
+                        </small>
 
                     </label>
 
@@ -309,54 +323,101 @@
                         id="selected-file"
                         class="selected-file"
                         hidden
-                    ></div>
+                    >
+
+                        <div class="selected-file-info">
+
+                            <svg
+                                viewBox="0 0 24 24"
+                                aria-hidden="true"
+                            >
+                                <path
+                                    d="M14 2H6C4.9 2 4 2.9 4 4V20C4 21.1 4.9 22 6 22H18C19.1 22 20 21.1 20 20V8L14 2Z"
+                                ></path>
+
+                                <path
+                                    d="M14 2V8H20"
+                                ></path>
+                            </svg>
+
+
+                            <div>
+                                <strong
+                                    id="selected-file-name"
+                                ></strong>
+
+                                <span
+                                    id="selected-file-size"
+                                ></span>
+                            </div>
+
+                        </div>
+
+
+                        <button
+                            id="remove-selected-file"
+                            class="selected-file-remove"
+                            type="button"
+                            aria-label="Убрать выбранный файл"
+                        >
+                            ×
+                        </button>
+
+                    </div>
 
 
                     <p
                         id="upload-error"
-                        class="page-error materials-error"
+                        class="page-error materials-message"
                         role="alert"
                     ></p>
 
 
                     <button
+                        id="document-upload-button"
                         type="submit"
                         class="primary-action materials-upload-button"
+                        disabled
                     >
                         Загрузить документ
                     </button>
 
-
-                    <p class="materials-api-note">
-                        Интерфейс готов. Отправка файла будет подключена после
-                        появления API документов в backend.
-                    </p>
-
                 </form>
 
-            </div>
+            </article>
 
 
-            <div class="materials-list-card">
+            <article class="materials-card materials-list-card">
 
-                <div class="materials-section-heading">
+                <div class="materials-heading">
 
-                    <div>
-                        <h2>
-                            Материалы курса
-                        </h2>
+                    <h2>
+                        Материалы курса
+                    </h2>
 
-                        <p>
-                            Загруженные документы курса будут отображаться здесь.
-                        </p>
-                    </div>
+                    <p>
+                        Документы, добавленные в этот курс.
+                    </p>
 
                 </div>
 
 
                 <div
+                    id="materials-loading"
+                    class="materials-state"
+                >
+                    <div class="materials-loader"></div>
+
+                    <span>
+                        Загружаем материалы...
+                    </span>
+                </div>
+
+
+                <div
                     id="materials-empty"
-                    class="materials-empty-state"
+                    class="materials-state"
+                    hidden
                 >
 
                     <svg
@@ -364,27 +425,73 @@
                         aria-hidden="true"
                     >
                         <path
-                            d="M7 3h7l4 4v14H7z"
+                            d="M14 2H6C4.9 2 4 2.9 4 4V20C4 21.1 4.9 22 6 22H18C19.1 22 20 21.1 20 20V8L14 2Z"
                         ></path>
 
                         <path
-                            d="M14 3v5h5"
+                            d="M14 2V8H20"
                         ></path>
                     </svg>
 
 
                     <strong>
-                        Список материалов пока недоступен
+                        Материалов пока нет
                     </strong>
 
 
                     <span>
-                        После подключения API здесь появится список документов курса.
+                        Загруженные документы появятся здесь.
                     </span>
 
                 </div>
 
-            </div>
+
+                <div
+                    id="materials-unavailable"
+                    class="materials-state"
+                    hidden
+                >
+
+                    <svg
+                        viewBox="0 0 24 24"
+                        aria-hidden="true"
+                    >
+                        <path
+                            d="M14 2H6C4.9 2 4 2.9 4 4V20C4 21.1 4.9 22 6 22H18C19.1 22 20 21.1 20 20V8L14 2Z"
+                        ></path>
+
+                        <path
+                            d="M14 2V8H20"
+                        ></path>
+                    </svg>
+
+
+                    <strong>
+                        Материалы скоро будут доступны
+                    </strong>
+
+
+                    <span>
+                        Backend API документов пока не подключён.
+                    </span>
+
+                </div>
+
+
+                <div
+                    id="materials-error"
+                    class="materials-state materials-state-error"
+                    hidden
+                ></div>
+
+
+                <div
+                    id="materials-list"
+                    class="materials-list"
+                    hidden
+                ></div>
+
+            </article>
 
         </section>
 

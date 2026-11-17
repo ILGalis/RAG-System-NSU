@@ -1,9 +1,114 @@
+const DOCUMENT_API = {
+    list(spaceId) {
+        return `/spaces/${encodeURIComponent(spaceId)}/documents`;
+    },
+
+    upload(spaceId) {
+        return `/spaces/${encodeURIComponent(spaceId)}/documents`;
+    }
+};
+
+
 const ALLOWED_DOCUMENT_EXTENSIONS = [
     "pdf",
     "docx",
     "txt"
 ];
 
+
+let selectedDocument = null;
+
+
+/* Курс */
+
+function getMaterialsSpaceId() {
+    const params =
+        new URLSearchParams(
+            window.location.search
+        );
+
+    return params.get(
+        "space_id"
+    );
+}
+
+
+function getMaterialsAccessToken() {
+    return localStorage.getItem(
+        "access_token"
+    );
+}
+
+
+function getMaterialsCurrentUserId() {
+    const value =
+        Number(
+            localStorage.getItem(
+                "user_id"
+            )
+        );
+
+    return Number.isFinite(value) &&
+        value > 0
+        ? value
+        : null;
+}
+
+
+/* Ответ API */
+
+async function readMaterialsResponse(
+    response
+) {
+    if (response.status === 204) {
+        return {};
+    }
+
+    try {
+        return await response.json();
+    } catch {
+        return {};
+    }
+}
+
+
+function getMaterialsErrorMessage(
+    data,
+    fallback
+) {
+    if (data?.error?.message) {
+        return data.error.message;
+    }
+
+
+    if (
+        typeof data?.detail ===
+        "string"
+    ) {
+        return data.detail;
+    }
+
+
+    if (
+        Array.isArray(
+            data?.detail
+        )
+    ) {
+        return data.detail
+            .map(
+                (item) =>
+                    item.msg
+            )
+            .filter(Boolean)
+            .join(". ");
+    }
+
+
+    return fallback;
+}
+
+
+/* Файлы */
 
 function getFileExtension(
     fileName
@@ -13,6 +118,7 @@ function getFileExtension(
             .toLowerCase()
             .split(".");
 
+
     return parts.length > 1
         ? parts.pop()
         : "";
@@ -20,18 +126,30 @@ function getFileExtension(
 
 
 function formatFileSize(bytes) {
-    if (bytes < 1024) {
-        return `${bytes} Б`;
+    const value =
+        Number(bytes);
+
+
+    if (
+        !Number.isFinite(value) ||
+        value < 0
+    ) {
+        return "";
+    }
+
+
+    if (value < 1024) {
+        return `${value} Б`;
     }
 
 
     if (
-        bytes <
+        value <
         1024 * 1024
     ) {
         return `${
             (
-                bytes /
+                value /
                 1024
             ).toFixed(1)
         } КБ`;
@@ -40,7 +158,7 @@ function formatFileSize(bytes) {
 
     return `${
         (
-            bytes /
+            value /
             (
                 1024 *
                 1024
@@ -50,42 +168,7 @@ function formatFileSize(bytes) {
 }
 
 
-function renderSelectedFile(
-    file
-) {
-    const selectedFile =
-        document.getElementById(
-            "selected-file"
-        );
-
-
-    if (!selectedFile) {
-        return;
-    }
-
-
-    if (!file) {
-        selectedFile.hidden =
-            true;
-
-        selectedFile.textContent =
-            "";
-
-        return;
-    }
-
-
-    selectedFile.textContent =
-        `${file.name} · ${formatFileSize(file.size)}`;
-
-    selectedFile.hidden =
-        false;
-}
-
-
-function validateDocument(
-    file
-) {
+function validateDocument(file) {
     if (!file) {
         return "Выберите документ для загрузки.";
     }
@@ -111,78 +194,972 @@ function validateDocument(
 }
 
 
-document.addEventListener(
-    "DOMContentLoaded",
-    () => {
-        const form =
-            document.getElementById(
-                "document-upload-form"
+/* Ошибка загрузки */
+
+function showUploadError(message) {
+    const error =
+        document.getElementById(
+            "upload-error"
+        );
+
+
+    if (error) {
+        error.textContent =
+            message;
+    }
+}
+
+
+function clearUploadError() {
+    showUploadError("");
+}
+
+
+/* Выбранный файл */
+
+function renderSelectedDocument() {
+    const container =
+        document.getElementById(
+            "selected-file"
+        );
+
+    const name =
+        document.getElementById(
+            "selected-file-name"
+        );
+
+    const size =
+        document.getElementById(
+            "selected-file-size"
+        );
+
+    const uploadButton =
+        document.getElementById(
+            "document-upload-button"
+        );
+
+
+    if (
+        !container ||
+        !name ||
+        !size
+    ) {
+        return;
+    }
+
+
+    if (!selectedDocument) {
+        container.hidden =
+            true;
+
+        name.textContent =
+            "";
+
+        size.textContent =
+            "";
+
+
+        if (uploadButton) {
+            uploadButton.disabled =
+                true;
+        }
+
+
+        return;
+    }
+
+
+    name.textContent =
+        selectedDocument.name;
+
+
+    size.textContent =
+        formatFileSize(
+            selectedDocument.size
+        );
+
+
+    container.hidden =
+        false;
+
+
+    if (uploadButton) {
+        uploadButton.disabled =
+            false;
+    }
+}
+
+
+function setSelectedDocument(file) {
+    clearUploadError();
+
+
+    const validationError =
+        validateDocument(file);
+
+
+    if (validationError) {
+        selectedDocument =
+            null;
+
+
+        renderSelectedDocument();
+
+
+        showUploadError(
+            validationError
+        );
+
+
+        return;
+    }
+
+
+    selectedDocument =
+        file;
+
+
+    renderSelectedDocument();
+}
+
+
+function clearSelectedDocument() {
+    const input =
+        document.getElementById(
+            "document-file"
+        );
+
+
+    selectedDocument =
+        null;
+
+
+    if (input) {
+        input.value = "";
+    }
+
+
+    renderSelectedDocument();
+
+    clearUploadError();
+}
+
+
+/* Состояние загрузки */
+
+function setUploadLoading(
+    loading
+) {
+    const button =
+        document.getElementById(
+            "document-upload-button"
+        );
+
+
+    if (!button) {
+        return;
+    }
+
+
+    button.disabled =
+        loading ||
+        !selectedDocument;
+
+
+    button.textContent =
+        loading
+            ? "Загрузка..."
+            : "Загрузить документ";
+}
+
+
+/* Ответ списка документов */
+
+function getDocumentsFromResponse(
+    data
+) {
+    if (Array.isArray(data)) {
+        return data;
+    }
+
+
+    if (
+        Array.isArray(
+            data?.documents
+        )
+    ) {
+        return data.documents;
+    }
+
+
+    if (
+        Array.isArray(
+            data?.items
+        )
+    ) {
+        return data.items;
+    }
+
+
+    if (
+        Array.isArray(
+            data?.results
+        )
+    ) {
+        return data.results;
+    }
+
+
+    return [];
+}
+
+
+function getDocumentName(
+    documentItem
+) {
+    return (
+        documentItem.filename ||
+        documentItem.file_name ||
+        documentItem.original_name ||
+        documentItem.name ||
+        "Документ"
+    );
+}
+
+
+function getDocumentSize(
+    documentItem
+) {
+    return (
+        documentItem.size_bytes ??
+        documentItem.file_size ??
+        documentItem.size ??
+        null
+    );
+}
+
+
+function getDocumentStatus(
+    documentItem
+) {
+    return (
+        documentItem.status ||
+        documentItem.processing_status ||
+        ""
+    );
+}
+
+
+function getDocumentStatusLabel(
+    status
+) {
+    switch (
+        String(status)
+            .toLowerCase()
+    ) {
+        case "ready":
+        case "completed":
+        case "indexed":
+            return "Готов";
+
+        case "processing":
+        case "pending":
+            return "Обработка";
+
+        case "failed":
+        case "error":
+            return "Ошибка";
+
+        default:
+            return status || "";
+    }
+}
+
+
+/* Карточка документа */
+
+function createDocumentCard(
+    documentItem
+) {
+    const card =
+        document.createElement(
+            "article"
+        );
+
+
+    card.className =
+        "material-item";
+
+
+    const icon =
+        document.createElement(
+            "div"
+        );
+
+
+    icon.className =
+        "material-item-icon";
+
+
+    icon.innerHTML = `
+        <svg
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+        >
+            <path
+                d="M14 2H6C4.9 2 4 2.9 4 4V20C4 21.1 4.9 22 6 22H18C19.1 22 20 21.1 20 20V8L14 2Z"
+            ></path>
+
+            <path
+                d="M14 2V8H20"
+            ></path>
+        </svg>
+    `;
+
+
+    const body =
+        document.createElement(
+            "div"
+        );
+
+
+    body.className =
+        "material-item-body";
+
+
+    const name =
+        document.createElement(
+            "strong"
+        );
+
+
+    name.className =
+        "material-item-name";
+
+
+    name.textContent =
+        getDocumentName(
+            documentItem
+        );
+
+
+    const meta =
+        document.createElement(
+            "div"
+        );
+
+
+    meta.className =
+        "material-item-meta";
+
+
+    const sizeValue =
+        getDocumentSize(
+            documentItem
+        );
+
+
+    if (sizeValue !== null) {
+        const size =
+            document.createElement(
+                "span"
             );
 
-        const input =
-            document.getElementById(
-                "document-file"
-            );
 
-        const error =
-            document.getElementById(
-                "upload-error"
+        size.textContent =
+            formatFileSize(
+                sizeValue
             );
 
 
+        meta.append(
+            size
+        );
+    }
+
+
+    const statusValue =
+        getDocumentStatus(
+            documentItem
+        );
+
+
+    if (statusValue) {
+        const status =
+            document.createElement(
+                "span"
+            );
+
+
+        status.className =
+            "material-status";
+
+
+        status.dataset.status =
+            String(
+                statusValue
+            ).toLowerCase();
+
+
+        status.textContent =
+            getDocumentStatusLabel(
+                statusValue
+            );
+
+
+        meta.append(
+            status
+        );
+    }
+
+
+    body.append(
+        name,
+        meta
+    );
+
+
+    card.append(
+        icon,
+        body
+    );
+
+
+    return card;
+}
+
+
+/* Состояния списка */
+
+function showMaterialsState(
+    state,
+    message = ""
+) {
+    const loading =
+        document.getElementById(
+            "materials-loading"
+        );
+
+    const empty =
+        document.getElementById(
+            "materials-empty"
+        );
+
+    const unavailable =
+        document.getElementById(
+            "materials-unavailable"
+        );
+
+    const error =
+        document.getElementById(
+            "materials-error"
+        );
+
+    const list =
+        document.getElementById(
+            "materials-list"
+        );
+
+
+    if (loading) {
+        loading.hidden =
+            state !==
+            "loading";
+    }
+
+
+    if (empty) {
+        empty.hidden =
+            state !==
+            "empty";
+    }
+
+
+    if (unavailable) {
+        unavailable.hidden =
+            state !==
+            "unavailable";
+    }
+
+
+    if (error) {
+        error.hidden =
+            state !==
+            "error";
+
+
+        error.textContent =
+            state === "error"
+                ? message
+                : "";
+    }
+
+
+    if (list) {
+        list.hidden =
+            state !==
+            "list";
+    }
+}
+
+
+function renderDocuments(
+    documents
+) {
+    const list =
+        document.getElementById(
+            "materials-list"
+        );
+
+
+    if (!list) {
+        return;
+    }
+
+
+    list.replaceChildren();
+
+
+    if (!documents.length) {
+        showMaterialsState(
+            "empty"
+        );
+
+        return;
+    }
+
+
+    documents.forEach(
+        (documentItem) => {
+            list.append(
+                createDocumentCard(
+                    documentItem
+                )
+            );
+        }
+    );
+
+
+    showMaterialsState(
+        "list"
+    );
+}
+
+
+/* Загрузка списка */
+
+async function loadDocuments() {
+    const spaceId =
+        getMaterialsSpaceId();
+
+    const token =
+        getMaterialsAccessToken();
+
+
+    if (!spaceId) {
+        showMaterialsState(
+            "error",
+            "Курс не выбран."
+        );
+
+        return;
+    }
+
+
+    if (!token) {
+        showMaterialsState(
+            "error",
+            "Для просмотра материалов необходимо войти в систему."
+        );
+
+        return;
+    }
+
+
+    showMaterialsState(
+        "loading"
+    );
+
+
+    try {
+        const response =
+            await fetch(
+                DOCUMENT_API.list(
+                    spaceId
+                ),
+                {
+                    headers: {
+                        "Authorization":
+                            `Bearer ${token}`
+                    }
+                }
+            );
+
+
+        /*
+         * Пока document API
+         * не реализован, не трогаем
+         * авторизацию пользователя.
+         */
         if (
-            !form ||
-            !input ||
-            !error
+            response.status === 404 ||
+            response.status === 405
         ) {
+            showMaterialsState(
+                "unavailable"
+            );
+
             return;
         }
 
 
-        input.addEventListener(
-            "change",
-            () => {
-                error.textContent =
-                    "";
+        /*
+         * Также не очищаем localStorage
+         * при 401 от недоделанной
+         * document-ручки.
+         */
+        if (
+            response.status === 401
+        ) {
+            showMaterialsState(
+                "unavailable"
+            );
 
-                renderSelectedFile(
-                    input.files[0] ??
-                        null
-                );
-            }
+            return;
+        }
+
+
+        const data =
+            await readMaterialsResponse(
+                response
+            );
+
+
+        if (!response.ok) {
+            showMaterialsState(
+                "error",
+                getMaterialsErrorMessage(
+                    data,
+                    "Не удалось загрузить материалы курса."
+                )
+            );
+
+            return;
+        }
+
+
+        renderDocuments(
+            getDocumentsFromResponse(
+                data
+            )
         );
 
-
-        form.addEventListener(
-            "submit",
-            (event) => {
-                event.preventDefault();
-
-
-                const file =
-                    input.files[0] ??
-                    null;
-
-
-                const validationError =
-                    validateDocument(
-                        file
-                    );
-
-
-                if (
-                    validationError
-                ) {
-                    error.textContent =
-                        validationError;
-
-                    return;
-                }
-
-
-                error.textContent =
-                    "Загрузка документов пока недоступна: backend API документов ещё не реализован.";
-            }
+    } catch {
+        showMaterialsState(
+            "error",
+            "Не удалось подключиться к серверу."
         );
     }
+}
+
+
+/* Загрузка документа */
+
+async function uploadDocument() {
+    const spaceId =
+        getMaterialsSpaceId();
+
+    const token =
+        getMaterialsAccessToken();
+
+
+    clearUploadError();
+
+
+    if (!spaceId) {
+        showUploadError(
+            "Курс не выбран."
+        );
+
+        return;
+    }
+
+
+    if (!token) {
+        showUploadError(
+            "Для загрузки документа необходимо войти в систему."
+        );
+
+        return;
+    }
+
+
+    const validationError =
+        validateDocument(
+            selectedDocument
+        );
+
+
+    if (validationError) {
+        showUploadError(
+            validationError
+        );
+
+        return;
+    }
+
+
+    const formData =
+        new FormData();
+
+
+    /*
+     * Ожидаемый backend-контракт:
+     * multipart/form-data
+     * поле файла: file
+     */
+    formData.append(
+        "file",
+        selectedDocument
+    );
+
+
+    setUploadLoading(
+        true
+    );
+
+
+    try {
+        const response =
+            await fetch(
+                DOCUMENT_API.upload(
+                    spaceId
+                ),
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Authorization":
+                            `Bearer ${token}`
+                    },
+
+                    body:
+                        formData
+                }
+            );
+
+
+        /*
+         * Backend API документов
+         * пока не реализован.
+         *
+         * Не удаляем авторизацию
+         * пользователя при ошибках
+         * этой ручки.
+         */
+        if (
+            response.status === 404 ||
+            response.status === 405 ||
+            response.status === 401
+        ) {
+            showUploadError(
+                "API загрузки документов пока не подключён на backend."
+            );
+
+            return;
+        }
+
+
+        const data =
+            await readMaterialsResponse(
+                response
+            );
+
+
+        if (!response.ok) {
+            showUploadError(
+                getMaterialsErrorMessage(
+                    data,
+                    "Не удалось загрузить документ."
+                )
+            );
+
+            return;
+        }
+
+
+        clearSelectedDocument();
+
+
+        await loadDocuments();
+
+    } catch {
+        showUploadError(
+            "Не удалось подключиться к серверу."
+        );
+
+    } finally {
+        setUploadLoading(
+            false
+        );
+    }
+}
+
+
+/* Права владельца */
+
+function configureUploadAccess(
+    course
+) {
+    const uploadCard =
+        document.getElementById(
+            "materials-upload-card"
+        );
+
+
+    const currentUserId =
+        getMaterialsCurrentUserId();
+
+
+    if (!uploadCard) {
+        return;
+    }
+
+
+    uploadCard.hidden =
+        course.owner_id !==
+        currentUserId;
+}
+
+
+/* Инициализация */
+
+function initMaterialsPage() {
+    const form =
+        document.getElementById(
+            "document-upload-form"
+        );
+
+    const input =
+        document.getElementById(
+            "document-file"
+        );
+
+    const dropZone =
+        document.getElementById(
+            "file-drop-zone"
+        );
+
+    const removeButton =
+        document.getElementById(
+            "remove-selected-file"
+        );
+
+
+    if (
+        !form ||
+        !input ||
+        !dropZone
+    ) {
+        return;
+    }
+
+
+    renderSelectedDocument();
+
+
+    input.addEventListener(
+        "change",
+        () => {
+            setSelectedDocument(
+                input.files[0] ??
+                null
+            );
+        }
+    );
+
+
+    dropZone.addEventListener(
+        "dragover",
+        (event) => {
+            event.preventDefault();
+
+
+            dropZone.classList.add(
+                "drag-active"
+            );
+        }
+    );
+
+
+    dropZone.addEventListener(
+        "dragleave",
+        () => {
+            dropZone.classList.remove(
+                "drag-active"
+            );
+        }
+    );
+
+
+    dropZone.addEventListener(
+        "drop",
+        (event) => {
+            event.preventDefault();
+
+
+            dropZone.classList.remove(
+                "drag-active"
+            );
+
+
+            const file =
+                event.dataTransfer
+                    ?.files?.[0] ??
+                null;
+
+
+            setSelectedDocument(
+                file
+            );
+        }
+    );
+
+
+    if (removeButton) {
+        removeButton.addEventListener(
+            "click",
+            clearSelectedDocument
+        );
+    }
+
+
+    form.addEventListener(
+        "submit",
+        (event) => {
+            event.preventDefault();
+
+
+            uploadDocument();
+        }
+    );
+
+
+    loadDocuments();
+}
+
+
+document.addEventListener(
+    "course:loaded",
+    (event) => {
+        configureUploadAccess(
+            event.detail
+        );
+    }
+);
+
+
+document.addEventListener(
+    "DOMContentLoaded",
+    initMaterialsPage
 );
