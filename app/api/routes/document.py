@@ -74,6 +74,11 @@ async def upload_document(
 
     raw_name = file.filename or ""
     safe_name = Path(raw_name).name
+    if not safe_name:
+        raise AppError(400, "invalid_file_name", "Пустое имя файла")
+    if len(safe_name) > 150:
+        stem, dot, ext_part = safe_name.rpartition(".")
+        safe_name = (stem[:140] + "." + ext_part) if dot else safe_name[:150]
     if "." not in safe_name:
         raise AppError(400, "invalid_file_type", "Файл без расширения")
 
@@ -100,6 +105,12 @@ async def upload_document(
             400,
             "file_too_large",
             f"Максимум {MAX_FILE_SIZE // (1024 * 1024)} MB",
+        )
+    if not _check_magic(ext, content):
+        raise AppError(
+            400,
+            "invalid_file_content",
+            "Содержимое файла не соответствует расширению",
         )
 
     storage_name = f"{uuid4().hex}_{safe_name}"

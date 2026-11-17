@@ -107,3 +107,50 @@ def test_document_not_found(client, make_user):
     r = client.get(f"/spaces/{sid}/documents/9999", headers=u["headers"])
     assert r.status_code == 404
     assert r.json()["error"]["code"] == "document_not_found"
+
+def test_upload_rejects_too_large(client, make_user, monkeypatch):
+    from app.api.routes import document as doc_routes
+
+    u = make_user()
+    sid = _create_space(client, u["headers"])
+    monkeypatch.setattr(doc_routes, "MAX_FILE_SIZE", 16)
+
+    r = _upload(client, u["headers"], sid, "big.txt", b"x" * 100)
+    assert r.status_code == 400
+    assert r.json()["error"]["code"] == "file_too_large"
+
+
+def test_cannot_access_foreign_document(client, make_user):
+    owner = make_user("o@g.nsu.ru")
+    other = make_user("x@g.nsu.ru")
+    sid_owner = _create_space(client, owner["headers"], name="owner-space")
+    sid_other = _create_space(client, other["headers"], name="other-space")
+
+    doc = _upload(client, owner["headers"], sid_owner, "a.txt", TXT_BYTES).json()
+    doc_id = doc["id"]
+
+    # other запрашивает свой space + чужой document_id → 404 (документа нет в этом space)
+    r = client.get(f"/spaces/{sid_other}/documents/{doc_id}", headers=other["headers"])
+    assert r.status_code == 404
+    assert r.json()["error"]["code"] == "document_not_found"
+
+    # other запрашивает чужой private space → 403 (нет доступа к space)
+    r = client.get(f"/spaces/{sid_owner}/documents/{doc_id}", headers=other["headers"])
+    assert r.status_code == 403
+    assert r.json()["error"]["code"] == "access_denied"
+
+    # other удаляет чужой document → 403 (не owner)
+    r = client.delete(f"/spaces/{sid_owner}/documents/{doc_id}", headers=other["headers"])
+    assert r.status_code == 403
+
+
+def test_fake_pdf_with_correct_mime_rejected(client, make_user):
+    u = make_user()
+    sid = _create_space(client, u["headers"])
+    r = client.post(
+        f"/spaces/{sid}/documents",
+        headers=u["headers"],
+        files={"file": ("fake.pdf", b"not really a pdf", "application/pdf")},
+    )
+    assert r.status_code == 400
+    assert r.json()["error"]["code"] == "invalid_file_content"
