@@ -143,3 +143,18 @@ def test_list_spaces_includes_owner_info(client, make_user):
     spaces = r.json()
     assert spaces[0]["owner"]["first_name"] == "Пётр"
     assert spaces[0]["faculty"] == "ФФ"
+
+def test_student_cannot_patch_space_to_public(client, make_user):
+    u = make_user(role="student")
+    sid = client.post(
+        "/spaces", headers=u["headers"],
+        json={"name": "S", "owner_id": 1, "access_mode": "private"},
+    ).json()["id"]
+
+    r = client.patch(
+        f"/spaces/{sid}",
+        headers=u["headers"],
+        json={"access_mode": "public"},
+    )
+    assert r.status_code == 403
+    assert r.json()["error"]["code"] == "public_requires_teacher"

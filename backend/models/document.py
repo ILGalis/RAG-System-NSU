@@ -46,7 +46,7 @@ class Document(Base):
     file_path: Mapped[str] = mapped_column(String(1000), nullable=False)
 
     file_type: Mapped[str] = mapped_column(String(10), nullable=False)
-
+    mime_type: Mapped[str | None] = mapped_column(String(100), nullable=True)
     file_size: Mapped[int] = mapped_column(BigInteger, nullable=False)
 
     status: Mapped[str] = mapped_column(

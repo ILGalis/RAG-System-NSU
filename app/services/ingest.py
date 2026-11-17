@@ -25,14 +25,12 @@ def ingest_document(document_id: int) -> None:
         db.commit()
 
         try:
-            # крч миха пусть аишка заревьюит это предложение
-            # TODO
-            #   from app.rag.ingest import ingest_document as rag_ingest
-            #   rag_ingest(
-            #       space_id=space_id_str(doc.space_id),
-            #       document_id=document_id_str(doc.id),
-            #       file_path=doc.file_path,
-            #   )
+            from app.rag.ingest import ingest_document as rag_ingest
+            rag_ingest(
+                space_id=space_id_str(doc.space_id),
+                document_id=document_id_str(doc.id),
+                file_path=doc.file_path,
+            )
             # B ожидает str для space_id/document_id (см. контракт collection).
             raise NotImplementedError("RAG ingest not wired yet (week 7-8)")
 

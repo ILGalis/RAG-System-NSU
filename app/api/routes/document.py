@@ -29,6 +29,31 @@ router = APIRouter(tags=["documents"])
 
 STORAGE_ROOT = Path("storage")
 ALLOWED_EXTENSIONS = {"pdf", "docx", "txt"}
+ALLOWED_MIME = {
+    "pdf": {"application/pdf"},
+    "docx": {"application/vnd.openxmlformats-officedocument.wordprocessingml.document"},
+    "txt": {"text/plain"},
+}
+
+def _check_magic(ext: str, content: bytes) -> bool:
+    #Проверка magic bytes — первая линия защиты от подмены содержимого.
+    if ext == "pdf":
+        return content.startswith(b"%PDF-")
+    if ext == "docx":
+        return content.startswith(b"PK\x03\x04")   # DOCX = zip
+    if ext == "txt":
+        try:
+            content.decode("utf-8")
+            return True
+        except UnicodeDecodeError:
+            try:
+                content.decode("cp1251")
+                return True
+            except UnicodeDecodeError:
+                return False
+    return False
+
+
 MAX_FILE_SIZE = 20 * 1024 * 1024  # 20 MB
 
 
@@ -59,6 +84,13 @@ async def upload_document(
             "invalid_file_type",
             f"Разрешены только: {', '.join(sorted(ALLOWED_EXTENSIONS))}",
         )
+    mime = (file.content_type or "").lower()
+    if mime not in ALLOWED_MIME[ext]:
+        raise AppError(
+            400,
+            "invalid_mime_type",
+            f"Ожидался MIME {', '.join(sorted(ALLOWED_MIME[ext]))}, получен {mime or 'unknown'}",
+        )
 
     content = await file.read()
     if not content:
@@ -82,6 +114,7 @@ async def upload_document(
         source_name=safe_name,
         file_path=str(file_path),
         file_type=ext,
+        mime_type = mime,
         file_size=len(content),
         status="pending",
     )

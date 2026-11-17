@@ -1,20 +1,23 @@
 from pathlib import Path
 import pytest
 from sqlalchemy import select
-
+import app.api.routes.document as doc_routes
 from backend.models import Document
 from tests.conftest import TestingSessionLocal
 
 
 PDF_BYTES = b"%PDF-1.4\nfake\n"
 TXT_BYTES = b"hello\n"
+#@pytest.fixture(autouse=True)
+#def _no_ingest(monkeypatch):
+#    """BackgroundTasks не должны ходить в БД во время тестов."""
+#    monkeypatch.setattr(
+#        "app.api.routes.document",
+#        lambda *a, **kw: None,
+#   )
 @pytest.fixture(autouse=True)
 def _no_ingest(monkeypatch):
-    """BackgroundTasks не должны ходить в БД во время тестов."""
-    monkeypatch.setattr(
-        "app.api.routes.document",
-        lambda *a, **kw: None,
-    )
+    monkeypatch.setattr(doc_routes, "ingest_document", lambda *a, **kw: None)
 
 def _upload(client, headers, space_id, filename, content, mime="text/plain"):
     return client.post(

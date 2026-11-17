@@ -75,6 +75,12 @@ def update_space(
     space = get_space_or_404(db, space_id)
     require_space_access(db, space, current_user)
     require_space_owner(space, current_user)
+    if data.access_mode == "public" and current_user.role != "teacher":
+        raise AppError(
+            403,
+            "public_requires_teacher",
+            "Публичные пространства создают только преподаватели",
+        )
     return space_crud.update_space(db, space, data)
 
 

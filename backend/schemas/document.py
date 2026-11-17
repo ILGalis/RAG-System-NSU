@@ -12,6 +12,7 @@ class DocumentResponse(BaseModel):
     file_type: str
     file_size: int
     status: str
+    mime_type: str | None
     error_message: str | None
     created_at: datetime
 
