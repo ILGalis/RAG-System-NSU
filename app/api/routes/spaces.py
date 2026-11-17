@@ -19,7 +19,8 @@ from backend.schemas.space import (
     RagSpaceResponse,
     RagSpaceUpdate,
 )
-
+from app.core.ids import space_id_str
+from app.services.qdrant_cleanup import delete_space_points
 router = APIRouter(prefix="/spaces", tags=["spaces"])
 
 
@@ -119,7 +120,7 @@ def delete_space(
     ).all()
 
     space_crud.delete_space(db, space)
-
+    delete_space_points(space_id_str(space_id))
     for path in file_paths:
         try:
             Path(path).unlink(missing_ok=True)

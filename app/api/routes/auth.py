@@ -8,7 +8,8 @@ from pathlib import Path
 from fastapi import APIRouter, Depends, status
 from sqlalchemy import select
 from sqlalchemy.orm import Session
-
+from app.core.ids import document_id_str, space_id_str
+from app.services.qdrant_cleanup import delete_document_points, delete_space_points
 from app.api.deps import get_current_user, get_db
 from app.core.error import AppError
 from backend.core.security import hash_password, verify_password
@@ -183,7 +184,13 @@ def delete_me(
     space_ids = db.scalars(
         select(RagSpace.id).where(RagSpace.owner_id == current_user.id)
     ).all()
-
+    own_space_ids = list(space_ids)
+    foreign_docs = db.execute(
+        select(Document.space_id, Document.id).where(
+            Document.uploaded_by == current_user.id,
+            Document.space_id.notin_(own_space_ids) if own_space_ids else True,
+        )
+    ).all()
     db.delete(current_user)
     db.commit()
 
@@ -198,3 +205,8 @@ def delete_me(
         space_dir = Path("storage/spaces") / str(sid)
         if space_dir.exists():
             shutil.rmtree(space_dir, ignore_errors=True)
+    for sid in own_space_ids:
+        delete_space_points(space_id_str(sid))
+
+    for f_space_id, f_doc_id in foreign_docs:
+        delete_document_points(space_id_str(f_space_id), document_id_str(f_doc_id))

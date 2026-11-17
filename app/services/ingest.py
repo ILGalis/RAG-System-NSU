@@ -1,6 +1,6 @@
 import logging
 from pathlib import Path
-
+from app.services.qdrant_cleanup import delete_document_points
 from backend.db.connection import SessionLocal
 from backend.models import Document
 from app.core.ids import document_id_str, space_id_str
@@ -55,7 +55,9 @@ def _run_pipeline(doc: Document) -> None:
     from backend.core.config import settings
 
     parser = _pick_parser(doc.file_type)
+    from dataclasses import replace
     parsed = parser.parse(Path(doc.file_path))
+    parsed = replace(parsed, source_name=doc.source_name)
     chunks = chunk_document(parsed)
     if not chunks:
         raise ValueError("Document produced no chunks")
@@ -72,5 +74,16 @@ def _run_pipeline(doc: Document) -> None:
             space_id=space_id_str(doc.space_id),
             document_id=document_id_str(doc.id),
         )
+
     finally:
         client.close()
+        # Race guard: если документ удалили во время эмбеддинга — откатываем Qdrant
+    check = SessionLocal()
+    try:
+        alive = check.get(Document, doc.id) is not None
+    finally:
+        check.close()
+
+    if not alive:
+        delete_document_points(space_id_str(doc.space_id), document_id_str(doc.id))
+        raise RuntimeError("Document deleted during ingestion")

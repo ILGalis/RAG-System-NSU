@@ -4,7 +4,7 @@ from sqlalchemy import select
 import app.api.routes.document as doc_routes
 from backend.models import Document
 from tests.conftest import TestingSessionLocal
-
+from urllib.parse import quote, unquote
 
 PDF_BYTES = b"%PDF-1.4\nfake\n"
 TXT_BYTES = b"hello\n"
@@ -15,6 +15,10 @@ TXT_BYTES = b"hello\n"
 #        "app.api.routes.document",
 #        lambda *a, **kw: None,
 #   )
+@pytest.fixture(autouse=True)
+def _no_qdrant(monkeypatch):
+    monkeypatch.setattr("app.services.qdrant_cleanup.delete_document_points", lambda *a, **kw: None)
+    monkeypatch.setattr("app.services.qdrant_cleanup.delete_space_points", lambda *a, **kw: None)
 @pytest.fixture(autouse=True)
 def _no_ingest(monkeypatch):
     monkeypatch.setattr(doc_routes, "ingest_document", lambda *a, **kw: None)
@@ -154,3 +158,47 @@ def test_fake_pdf_with_correct_mime_rejected(client, make_user):
     )
     assert r.status_code == 400
     assert r.json()["error"]["code"] == "invalid_file_content"
+def test_download_by_owner(client, make_user):
+    u = make_user()
+    sid = _create_space(client, u["headers"])
+    doc = _upload(client, u["headers"], sid, "заметки.txt", TXT_BYTES).json()
+
+    r = client.get(f"/spaces/{sid}/documents/{doc['id']}/download", headers=u["headers"])
+    assert r.status_code == 200
+    assert r.content == TXT_BYTES
+
+    cd = r.headers.get("content-disposition", "")
+    assert f"filename*=utf-8''{quote('заметки.txt')}" in cd
+    assert "заметки.txt" in unquote(cd)
+
+
+def test_download_forbidden_for_outsider(client, make_user):
+    owner = make_user("o@g.nsu.ru")
+    other = make_user("x@g.nsu.ru")
+    sid = _create_space(client, owner["headers"])
+    doc = _upload(client, owner["headers"], sid, "a.txt", TXT_BYTES).json()
+
+    r = client.get(f"/spaces/{sid}/documents/{doc['id']}/download", headers=other["headers"])
+    assert r.status_code == 403
+
+
+def test_download_cross_space_404(client, make_user):
+    u = make_user()
+    sid1 = _create_space(client, u["headers"], name="one")
+    sid2 = _create_space(client, u["headers"], name="two")
+    doc = _upload(client, u["headers"], sid1, "a.txt", TXT_BYTES).json()
+
+    r = client.get(f"/spaces/{sid2}/documents/{doc['id']}/download", headers=u["headers"])
+    assert r.status_code == 404
+
+
+def test_upload_long_cyrillic_filename(client, make_user):
+    u = make_user()
+    sid = _create_space(client, u["headers"])
+    long_name = "я" * 120 + ".txt"    # 240+ байт в UTF-8
+
+    r = _upload(client, u["headers"], sid, long_name, TXT_BYTES)
+    assert r.status_code == 201, r.text
+    body = r.json()
+    assert body["source_name"] == long_name      # оригинал в БД
+    assert body["file_type"] == "txt"

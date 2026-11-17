@@ -12,6 +12,8 @@ from fastapi import (
 )
 from sqlalchemy import select
 from sqlalchemy.orm import Session
+from app.core.ids import document_id_str, space_id_str
+from app.services.qdrant_cleanup import delete_document_points
 
 from app.api.deps import (
     get_current_user,
@@ -26,6 +28,14 @@ from backend.models import Document, User
 from backend.schemas.document import DocumentResponse
 
 router = APIRouter(tags=["documents"])
+
+from fastapi.responses import FileResponse
+
+MIME_BY_TYPE = {
+    "pdf": "application/pdf",
+    "docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "txt": "text/plain",
+}
 
 STORAGE_ROOT = Path("storage")
 ALLOWED_EXTENSIONS = {"pdf", "docx", "txt"}
@@ -71,7 +81,7 @@ async def upload_document(
 ) -> DocumentResponse:
     space = get_space_or_404(db, space_id)
     require_space_owner(space, current_user)
-
+    #блок про truncate длины safe_name пока убирать не буду
     raw_name = file.filename or ""
     safe_name = Path(raw_name).name
     if not safe_name:
@@ -113,8 +123,11 @@ async def upload_document(
             "Содержимое файла не соответствует расширению",
         )
 
-    storage_name = f"{uuid4().hex}_{safe_name}"
+    #storage_name = f"{uuid4().hex}_{safe_name}"
+    #file_dir = STORAGE_ROOT / "spaces" / str(space_id) / "documents"
+    storage_name = f"{uuid4().hex}.{ext}"
     file_dir = STORAGE_ROOT / "spaces" / str(space_id) / "documents"
+
     file_dir.mkdir(parents=True, exist_ok=True)
     file_path = file_dir / storage_name
     file_path.write_bytes(content)
@@ -201,7 +214,37 @@ def delete_document(
     db.delete(doc)
     db.commit()
 
+    delete_document_points(space_id_str(space_id), document_id_str(document_id))
+
     try:
         file_path.unlink(missing_ok=True)
     except OSError:
         pass  # файл удалить не удалось — не ломаем ответ
+
+
+
+
+
+@router.get("/spaces/{space_id}/documents/{document_id}/download")
+def download_document(
+    space_id: int,
+    document_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> FileResponse:
+    space = get_space_or_404(db, space_id)
+    require_space_access(db, space, current_user)
+
+    doc = db.get(Document, document_id)
+    if doc is None or doc.space_id != space_id:
+        raise AppError(404, "document_not_found", "Документ не найден")
+
+    file_path = Path(doc.file_path)
+    if not file_path.exists():
+        raise AppError(404, "document_file_missing", "Файл не найден в хранилище")
+
+    return FileResponse(
+        path=file_path,
+        media_type=doc.mime_type or MIME_BY_TYPE.get(doc.file_type, "application/octet-stream"),
+        filename=doc.source_name,
+    )
