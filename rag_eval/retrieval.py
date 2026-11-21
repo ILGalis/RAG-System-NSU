@@ -1,9 +1,9 @@
-"""Evaluate dense and hybrid retrieval on the Week 7 study guide."""
+
 import argparse
 import hashlib
 import json
 import statistics
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from math import log2
 from pathlib import Path
 from time import perf_counter
@@ -93,7 +93,7 @@ def evaluate(
     document = DOCXParser().parse(source)
     questions = load_questions(dataset, document.source_name, document.text)
     chunks = chunk_document(document)
-    rows = {"dense": [], "hybrid": []}
+    rows = {"dense": [], "sparse": [], "hybrid": []}
     client = QdrantClient(":memory:")
     try:
         store = VectorStore(client, dimension=dimension)
@@ -105,23 +105,33 @@ def evaluate(
             embedding_ms = (perf_counter() - started) * 1000
             for mode, results in rows.items():
                 started = perf_counter()
-                hits = store.search(
-                    vector, space_id=SPACE_ID, limit=k, candidate_limit=candidate_limit,
-                    query_text=question.text if mode == "hybrid" else None,
-                )
+                if mode == "sparse":
+                    hits = store.search_sparse(question.text, space_id=SPACE_ID, limit=k)
+                else:
+                    hits = store.search(
+                        vector, space_id=SPACE_ID,
+                        limit=candidate_limit if mode == "hybrid" else k,
+                        candidate_limit=candidate_limit,
+                        query_text=question.text if mode == "hybrid" else None,
+                    )
                 search_ms = (perf_counter() - started) * 1000
                 results.append({
                     "question_id": question.id,
                     "first_relevant_rank": relevant_rank(
-                        hits, question, document_id=document_id, source_name=document.source_name,
+                        hits[:k], question, document_id=document_id, source_name=document.source_name,
                     ),
                     "search_ms": search_ms,
-                    "embedding_ms": embedding_ms,
+                    "embedding_ms": 0 if mode == "sparse" else embedding_ms,
+                    "question": question.text,
+                    "relevant_start": question.start,
+                    "relevant_end": question.end,
+                    "candidates": [asdict(hit) for hit in hits] if mode == "hybrid" else [],
                 })
     finally:
         client.close()
     return {
         "source_sha256": document_id,
+        "source_name": document.source_name,
         "question_count": len(questions),
         "excluded_unanswerable_count": len(dataset["cases"]) - len(questions),
         "chunk_count": len(chunks),

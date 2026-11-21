@@ -118,7 +118,7 @@ def test_model_can_abstain(retriever, openrouter):
 ])
 def test_rejects_invalid_evidence(retriever, openrouter, ref, quote):
     provider = openrouter(lambda _: completion({
-        "found": True, "sources": [{"ref": ref, "quote": quote}],
+        "found": True, "answer": f"Tuesday [{ref}].", "sources": [{"ref": ref, "quote": quote}],
     }))
     with pytest.raises(LLMError):
         RAGService(retriever, provider).ask("Exam?", space_id="physics")

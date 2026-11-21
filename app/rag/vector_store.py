@@ -131,8 +131,29 @@ class VectorStore:
             self.collection, query_filter=scope, limit=limit,
             with_payload=True, with_vectors=False, **kwargs,
         )
+        return self._hits(response.points)
+
+    def search_sparse(self, query_text: str, *, space_id: str,
+                      limit: int = 10) -> list[SearchHit]:
+        scope = models.Filter(must=[models.FieldCondition(
+            key="space_id", match=models.MatchValue(value=_identifier(space_id)))])
+        if type(limit) is not int or limit <= 0:
+            raise ValueError("limit must be a positive integer")
+        if not isinstance(query_text, str) or not query_text.strip():
+            raise ValueError("query_text must be a non-empty string")
+        vector = lexical_vector(query_text, query=True)
+        if not vector.indices:
+            return []
+        response = self.client.query_points(
+            self.collection, query=vector, using="lexical", query_filter=scope,
+            limit=limit, with_payload=True, with_vectors=False,
+        )
+        return self._hits(response.points)
+
+    @staticmethod
+    def _hits(points) -> list[SearchHit]:
         hits = []
-        for point in response.points:
+        for point in points:
             payload = point.payload
             hits.append(SearchHit(
                 point_id=str(point.id), score=point.score,

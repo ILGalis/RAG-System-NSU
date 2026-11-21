@@ -63,7 +63,7 @@ def test_evaluation_with_fake_embeddings(tmp_path):
     }
     result = evaluate(dataset, path, FakeEmbedding(), dimension=2, k=5, candidate_limit=50)
     assert result["question_count"] == 1
-    for mode in ("dense", "hybrid"):
+    for mode in ("dense", "sparse", "hybrid"):
         assert result["modes"][mode]["metrics"]["recall_at_k"] == 1
         row, = result["modes"][mode]["questions"]
         assert row["question_id"] == "exam"
