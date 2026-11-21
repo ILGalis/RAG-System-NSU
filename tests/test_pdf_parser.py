@@ -51,23 +51,23 @@ import pymupdf
 def test_pdf_preserves_russian_text_and_page_structure(tmp_path):
     """Russian text and page boundaries should be preserved."""
     file_path = tmp_path / "russian.pdf"
-    font_path = "/System/Library/Fonts/Supplemental/Arial.ttf"
+    font = pymupdf.Font("cjk")
 
     with pymupdf.open() as pdf:
         first_page = pdf.new_page()
-        first_page.insert_font(fontname="Arial", fontfile=font_path)
+        first_page.insert_font(fontname="TestFont", fontbuffer=font.buffer)
         first_page.insert_text(
             (72, 72),
             "Привет, студент!",
-            fontname="Arial",
+            fontname="TestFont",
         )
 
         second_page = pdf.new_page()
-        second_page.insert_font(fontname="Arial", fontfile=font_path)
+        second_page.insert_font(fontname="TestFont", fontbuffer=font.buffer)
         second_page.insert_text(
             (72, 72),
             "Вторая страница",
-            fontname="Arial",
+            fontname="TestFont",
         )
 
         pdf.save(file_path)
