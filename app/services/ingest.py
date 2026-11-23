@@ -6,7 +6,10 @@ from backend.models import Document
 from app.core.ids import document_id_str, space_id_str
 
 logger = logging.getLogger(__name__)
-
+"""
+неделя 8 комментарий, потом сделать
+По integration.py и errors.py: их действительно нет, B пока написал только Retriever (поиск). Высокоуровневый RAGApplication, про который он писал в тексте, он еще не залил. Значит, оставляем текущий ingest.py (с ручной склейкой парсера, чанкера, эмбеддингов и VectorStore). Когда B закинет integration.py, мы просто заменим внутренности _run_pipeline, а пока всё работает как есть. qdrant_cleanup.py тоже оставляем наш.
+"""
 
 def ingest_document(document_id: int) -> None:
     db = SessionLocal()

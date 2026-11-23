@@ -104,3 +104,9 @@ def require_space_owner(space: RagSpace, user: User) -> None:
             "not_owner",
             "Только владелец может изменять пространство",
         )
+
+def require_space_member(db: Session, space: RagSpace, user: User) -> None:
+    """Пускает только владельца или участника (без учета public-доступа)."""
+    if space.owner_id == user.id or _is_space_member(db, space.id, user.id):
+        return
+    raise AppError(403, "access_denied", "Нет доступа к пространству")

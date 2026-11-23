@@ -3,6 +3,7 @@ from backend.models.session import UserSession
 from backend.models.space import RagSpace, SpaceMember
 from backend.models.user import User
 from backend.models.document import Document
+from backend.models.invitation import Invitation
 __all__ = [
     "User",
     "RagSpace",
@@ -10,4 +11,5 @@ __all__ = [
     "UserSession",
     "EmailVerificationToken",
     "Document",
+    "Invitation",
 ]
