@@ -1,11 +1,13 @@
 from datetime import datetime
 from typing import Literal
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 
+#class InvitationCreate(BaseModel):
+#   ttl_hours: int = 168  #это в часах, по умолчанию 7 дней
 class InvitationCreate(BaseModel):
-    ttl_hours: int = 168  #это в часах, по умолчанию 7 дней
-
+    # от 1 часа до двух недель
+    ttl_hours: int = Field(default=168, gt=0, le=320)
 
 class InvitationResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)

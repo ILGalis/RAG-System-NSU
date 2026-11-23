@@ -68,6 +68,7 @@ def list_invitations(
 
     invs = db.scalars(select(Invitation).where(Invitation.space_id == space_id)).all()
     now = datetime.now(timezone.utc)
+
     
     return [
         InvitationResponse(
@@ -107,7 +108,7 @@ def accept_invitation(
     current_user: User = Depends(get_current_user),
 ):
     inv = db.scalar(
-        select(Invitation).where(Invitation.code_hash == _hash_code(data.code))
+        select(Invitation).where(Invitation.code_hash == _hash_code(data.code)).with_for_update()
     )
     
     now = datetime.now(timezone.utc)
