@@ -1,0 +1,241 @@
+/* Боковая панель */
+
+.sidebar {
+    position: fixed;
+
+    overflow: hidden;
+    isolation: isolate;
+
+    padding-bottom: 170px;
+
+    background:
+        var(--color-sidebar-background);
+
+    border-right: 0;
+
+    box-shadow:
+        6px 0 24px rgba(47, 72, 40, 0.07);
+}
+
+
+/* Фоновый паттерн */
+
+.sidebar::before {
+    content: "";
+
+    position: absolute;
+    inset: 0;
+
+    z-index: 0;
+
+    background:
+        var(--color-sidebar-pattern);
+
+    opacity:
+        var(--sidebar-pattern-opacity);
+
+    -webkit-mask-image:
+        url("../assets/sidebar/nsu-sidebar-pattern.svg");
+
+    mask-image:
+        url("../assets/sidebar/nsu-sidebar-pattern.svg");
+
+    -webkit-mask-size:
+        var(--sidebar-pattern-size) auto;
+
+    mask-size:
+        var(--sidebar-pattern-size) auto;
+
+    -webkit-mask-repeat:
+        repeat;
+
+    mask-repeat:
+        repeat;
+
+    -webkit-mask-position:
+        center center;
+
+    mask-position:
+        center center;
+
+    mask-mode:
+        alpha;
+
+    pointer-events:
+        none;
+}
+
+
+/* Логотип */
+
+.sidebar-logo {
+    position: relative;
+
+    z-index: 2;
+
+    color:
+        var(--color-sidebar-text);
+}
+
+
+.sidebar-logo:hover {
+    color:
+        var(--color-sidebar-text);
+}
+
+
+.sidebar-logo-icon span {
+    background:
+        currentColor;
+}
+
+
+.sidebar-logo-icon span:last-child {
+    opacity: 0.45;
+}
+
+
+/* Навигация */
+
+.sidebar-nav {
+    position: relative;
+
+    z-index: 2;
+}
+
+
+.sidebar-link {
+    color:
+        var(--color-sidebar-text);
+}
+
+
+.sidebar-link svg {
+    color:
+        currentColor;
+}
+
+
+.sidebar-link:hover {
+    background:
+        rgba(255, 255, 255, 0.11);
+
+    color:
+        var(--color-sidebar-text);
+
+    transform:
+        none;
+}
+
+
+.sidebar-link.active {
+    background:
+        var(--color-sidebar-active-background);
+
+    border-color:
+        transparent;
+
+    color:
+        var(--color-sidebar-active-text);
+
+    font-weight:
+        600;
+}
+
+
+.sidebar-link.active:hover {
+    background:
+        var(--color-sidebar-active-background);
+
+    color:
+        var(--color-sidebar-active-text);
+}
+
+
+.sidebar-link.active svg {
+    color:
+        currentColor;
+}
+
+
+/* Нижняя композиция */
+
+.sidebar-decoration {
+    position: absolute;
+
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    z-index: 1;
+
+    width: 100%;
+
+    aspect-ratio: 360 / 196;
+
+    color:
+        var(--color-sidebar-decoration);
+
+    pointer-events:
+        none;
+}
+
+
+.sidebar-perch,
+.sidebar-owl {
+    position: absolute;
+
+    background:
+        currentColor;
+
+    -webkit-mask-repeat:
+        no-repeat;
+
+    mask-repeat:
+        no-repeat;
+
+    -webkit-mask-size:
+        100% 100%;
+
+    mask-size:
+        100% 100%;
+
+    mask-mode:
+        alpha;
+}
+
+
+/* Жёрдочка */
+
+.sidebar-perch {
+    left: 0;
+    top: 58.1632653061%;
+
+    width: 100%;
+
+    aspect-ratio: 360 / 72;
+
+    -webkit-mask-image:
+        url("../assets/sidebar/nsu-perch.svg");
+
+    mask-image:
+        url("../assets/sidebar/nsu-perch.svg");
+}
+
+
+/* Сова */
+
+.sidebar-owl {
+    left: 40%;
+    top: 14.6774060125%;
+
+    width: 28.8888888889%;
+
+    aspect-ratio: 120 / 154;
+
+    -webkit-mask-image:
+        url("../assets/sidebar/nsu-owl.svg");
+
+    mask-image:
+        url("../assets/sidebar/nsu-owl.svg");
+}

@@ -1,3 +1,5 @@
+/* Данные курса */
+
 function getSpaceId() {
     const params =
         new URLSearchParams(
@@ -32,6 +34,8 @@ function getCurrentUserId() {
 }
 
 
+/* Авторизация */
+
 function clearAuthData() {
     localStorage.removeItem(
         "access_token"
@@ -63,6 +67,8 @@ function clearAuthData() {
 }
 
 
+/* Ответ API */
+
 async function readCourseResponse(
     response
 ) {
@@ -82,7 +88,20 @@ function getCourseErrorMessage(
         return data.error.message;
     }
 
-    if (Array.isArray(data?.detail)) {
+
+    if (
+        typeof data?.detail ===
+        "string"
+    ) {
+        return data.detail;
+    }
+
+
+    if (
+        Array.isArray(
+            data?.detail
+        )
+    ) {
         return data.detail
             .map(
                 (item) =>
@@ -92,9 +111,12 @@ function getCourseErrorMessage(
             .join(". ");
     }
 
+
     return fallback;
 }
 
+
+/* Отображение курса */
 
 function getAccessLabel(
     accessMode
@@ -174,12 +196,9 @@ function renderCourseInfo(course) {
 
 
     if (owner) {
-        const isOwner =
-            course.owner_id ===
-            currentUserId;
-
         owner.hidden =
-            !isOwner;
+            course.owner_id !==
+            currentUserId;
     }
 
 
@@ -187,6 +206,8 @@ function renderCourseInfo(course) {
         `${course.name} — NSU RAG`;
 }
 
+
+/* Загрузка курса */
 
 async function loadCourse() {
     const spaceId =
@@ -220,10 +241,12 @@ async function loadCourse() {
                 "Курс не выбран";
         }
 
+
         if (error) {
             error.textContent =
                 "Откройте курс из списка курсов.";
         }
+
 
         return;
     }
@@ -272,6 +295,7 @@ async function loadCourse() {
                     "Курс";
             }
 
+
             if (error) {
                 error.textContent =
                     getCourseErrorMessage(
@@ -279,6 +303,7 @@ async function loadCourse() {
                         "Не удалось открыть курс."
                     );
             }
+
 
             return;
         }
@@ -293,11 +318,22 @@ async function loadCourse() {
             data
         );
 
+
+        document.dispatchEvent(
+            new CustomEvent(
+                "course:loaded",
+                {
+                    detail: data
+                }
+            )
+        );
+
     } catch {
         if (title) {
             title.textContent =
                 "Курс";
         }
+
 
         if (error) {
             error.textContent =
@@ -306,6 +342,8 @@ async function loadCourse() {
     }
 }
 
+
+/* Запуск */
 
 document.addEventListener(
     "DOMContentLoaded",

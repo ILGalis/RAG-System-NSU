@@ -28,6 +28,11 @@
 
     <link
         rel="stylesheet"
+        href="/static/css/components/sidebar.css"
+    >
+
+    <link
+        rel="stylesheet"
         href="/static/css/components/card.css"
     >
 
@@ -68,37 +73,10 @@
                     viewBox="0 0 24 24"
                     aria-hidden="true"
                 >
-                    <rect
-                        x="3"
-                        y="3"
-                        width="7"
-                        height="7"
-                        rx="1"
-                    ></rect>
-
-                    <rect
-                        x="14"
-                        y="3"
-                        width="7"
-                        height="7"
-                        rx="1"
-                    ></rect>
-
-                    <rect
-                        x="3"
-                        y="14"
-                        width="7"
-                        height="7"
-                        rx="1"
-                    ></rect>
-
-                    <rect
-                        x="14"
-                        y="14"
-                        width="7"
-                        height="7"
-                        rx="1"
-                    ></rect>
+                    <rect x="3" y="3" width="7" height="7" rx="1"></rect>
+                    <rect x="14" y="3" width="7" height="7" rx="1"></rect>
+                    <rect x="3" y="14" width="7" height="7" rx="1"></rect>
+                    <rect x="14" y="14" width="7" height="7" rx="1"></rect>
                 </svg>
 
                 <span>Все курсы</span>
@@ -130,21 +108,23 @@
                     viewBox="0 0 24 24"
                     aria-hidden="true"
                 >
-                    <circle
-                        cx="12"
-                        cy="8"
-                        r="4"
-                    ></circle>
-
-                    <path
-                        d="M4.5 21a7.5 7.5 0 0 1 15 0"
-                    ></path>
+                    <circle cx="12" cy="8" r="4"></circle>
+                    <path d="M4.5 21a7.5 7.5 0 0 1 15 0"></path>
                 </svg>
 
                 <span>Профиль</span>
             </a>
 
         </nav>
+
+
+        <div
+            class="sidebar-decoration"
+            aria-hidden="true"
+        >
+            <div class="sidebar-perch"></div>
+            <div class="sidebar-owl"></div>
+        </div>
 
     </aside>
 
@@ -159,25 +139,25 @@
                 viewBox="0 0 24 24"
                 aria-hidden="true"
             >
-                <path
-                    d="M15 18L9 12L15 6"
-                ></path>
+                <path d="M15 18L9 12L15 6"></path>
             </svg>
 
             Мои курсы
         </a>
 
 
-        <header
-            class="page-header course-create-header"
-        >
+        <header class="page-header course-create-header">
+
             <div>
-                <h1>Создание курса</h1>
+                <h1>
+                    Создание курса
+                </h1>
 
                 <p>
                     Укажите название курса и выберите уровень доступа.
                 </p>
             </div>
+
         </header>
 
 

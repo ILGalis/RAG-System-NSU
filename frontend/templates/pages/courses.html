@@ -28,6 +28,11 @@
 
     <link
         rel="stylesheet"
+        href="/static/css/components/sidebar.css"
+    >
+
+    <link
+        rel="stylesheet"
         href="/static/css/components/card.css"
     >
 
@@ -146,6 +151,15 @@
 
         </nav>
 
+
+        <div
+            class="sidebar-decoration"
+            aria-hidden="true"
+        >
+            <div class="sidebar-perch"></div>
+            <div class="sidebar-owl"></div>
+        </div>
+
     </aside>
 
 
@@ -154,33 +168,14 @@
         <header class="page-header">
 
             <div>
-                <h1>Все курсы</h1>
+                <h1>
+                    Все курсы
+                </h1>
 
                 <p>
                     Доступные вам учебные курсы
                 </p>
             </div>
-
-
-            <a
-                href="course-new.html"
-                class="primary-action"
-            >
-                <svg
-                    viewBox="0 0 24 24"
-                    aria-hidden="true"
-                >
-                    <path
-                        d="M12 5v14"
-                    ></path>
-
-                    <path
-                        d="M5 12h14"
-                    ></path>
-                </svg>
-
-                Создать курс
-            </a>
 
         </header>
 
@@ -201,7 +196,6 @@
                     d="m20 20-4-4"
                 ></path>
             </svg>
-
 
             <input
                 type="search"
@@ -249,11 +243,9 @@
 
             </div>
 
-
             <h2>
                 Курсы не найдены
             </h2>
-
 
             <p>
                 Попробуйте изменить поисковый запрос.

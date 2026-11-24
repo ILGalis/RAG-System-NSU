@@ -28,6 +28,11 @@
 
     <link
         rel="stylesheet"
+        href="/static/css/components/sidebar.css"
+    >
+
+    <link
+        rel="stylesheet"
         href="/static/css/components/card.css"
     >
 
@@ -78,37 +83,10 @@
                     viewBox="0 0 24 24"
                     aria-hidden="true"
                 >
-                    <rect
-                        x="3"
-                        y="3"
-                        width="7"
-                        height="7"
-                        rx="1"
-                    ></rect>
-
-                    <rect
-                        x="14"
-                        y="3"
-                        width="7"
-                        height="7"
-                        rx="1"
-                    ></rect>
-
-                    <rect
-                        x="3"
-                        y="14"
-                        width="7"
-                        height="7"
-                        rx="1"
-                    ></rect>
-
-                    <rect
-                        x="14"
-                        y="14"
-                        width="7"
-                        height="7"
-                        rx="1"
-                    ></rect>
+                    <rect x="3" y="3" width="7" height="7" rx="1"></rect>
+                    <rect x="14" y="3" width="7" height="7" rx="1"></rect>
+                    <rect x="3" y="14" width="7" height="7" rx="1"></rect>
+                    <rect x="14" y="14" width="7" height="7" rx="1"></rect>
                 </svg>
 
                 <span>Все курсы</span>
@@ -140,21 +118,23 @@
                     viewBox="0 0 24 24"
                     aria-hidden="true"
                 >
-                    <circle
-                        cx="12"
-                        cy="8"
-                        r="4"
-                    ></circle>
-
-                    <path
-                        d="M4.5 21a7.5 7.5 0 0 1 15 0"
-                    ></path>
+                    <circle cx="12" cy="8" r="4"></circle>
+                    <path d="M4.5 21a7.5 7.5 0 0 1 15 0"></path>
                 </svg>
 
                 <span>Профиль</span>
             </a>
 
         </nav>
+
+
+        <div
+            class="sidebar-decoration"
+            aria-hidden="true"
+        >
+            <div class="sidebar-perch"></div>
+            <div class="sidebar-owl"></div>
+        </div>
 
     </aside>
 
@@ -169,25 +149,20 @@
                 viewBox="0 0 24 24"
                 aria-hidden="true"
             >
-                <path
-                    d="M15 18L9 12L15 6"
-                ></path>
+                <path d="M15 18L9 12L15 6"></path>
             </svg>
 
             Все курсы
         </a>
 
 
-        <header
-            class="page-header course-workspace-header"
-        >
+        <header class="page-header course-workspace-header">
 
             <div>
 
                 <h1 id="course-title">
                     Загрузка курса...
                 </h1>
-
 
                 <div class="course-workspace-meta">
 
@@ -197,7 +172,6 @@
                     >
                         Загрузка...
                     </span>
-
 
                     <span
                         id="course-owner"
@@ -224,7 +198,6 @@
                 AI-помощник
             </a>
 
-
             <a
                 id="materials-tab"
                 href="materials.html"
@@ -245,67 +218,53 @@
 
         <section class="materials-layout">
 
-            <article
+            <div
                 id="materials-upload-card"
-                class="materials-card"
+                class="materials-upload-card"
                 hidden
             >
 
-                <div class="materials-heading">
+                <div class="materials-section-heading">
 
-                    <h2>
-                        Загрузить материал
-                    </h2>
+                    <div>
 
-                    <p>
-                        Добавьте документ, который будет использоваться
-                        в материалах этого курса.
-                    </p>
+                        <h2>
+                            Загрузить материал
+                        </h2>
+
+                        <p>
+                            Добавьте учебный документ в выбранный курс.
+                        </p>
+
+                    </div>
 
                 </div>
 
 
-                <form
-                    id="document-upload-form"
-                >
+                <form id="document-upload-form">
 
                     <label
-                        id="file-drop-zone"
                         for="document-file"
                         class="file-drop-zone"
+                        id="file-drop-zone"
                     >
 
                         <svg
                             viewBox="0 0 24 24"
                             aria-hidden="true"
                         >
-                            <path
-                                d="M12 16V4"
-                            ></path>
-
-                            <path
-                                d="M7 9L12 4L17 9"
-                            ></path>
-
-                            <path
-                                d="M5 20H19"
-                            ></path>
+                            <path d="M12 16V4"></path>
+                            <path d="M7 9L12 4L17 9"></path>
+                            <path d="M5 20H19"></path>
                         </svg>
-
 
                         <strong>
                             Выберите документ
                         </strong>
 
-
                         <span>
-                            или перетащите его сюда
-                        </span>
-
-
-                        <small>
                             PDF, DOCX или TXT
-                        </small>
+                        </span>
 
                     </label>
 
@@ -325,7 +284,7 @@
                         hidden
                     >
 
-                        <div class="selected-file-info">
+                        <div class="selected-file-icon">
 
                             <svg
                                 viewBox="0 0 24 24"
@@ -340,25 +299,23 @@
                                 ></path>
                             </svg>
 
+                        </div>
 
-                            <div>
-                                <strong
-                                    id="selected-file-name"
-                                ></strong>
 
-                                <span
-                                    id="selected-file-size"
-                                ></span>
-                            </div>
+                        <div class="selected-file-info">
+
+                            <strong id="selected-file-name"></strong>
+
+                            <span id="selected-file-size"></span>
 
                         </div>
 
 
                         <button
+                            type="button"
                             id="remove-selected-file"
                             class="selected-file-remove"
-                            type="button"
-                            aria-label="Убрать выбранный файл"
+                            aria-label="Удалить выбранный файл"
                         >
                             ×
                         </button>
@@ -368,7 +325,7 @@
 
                     <p
                         id="upload-error"
-                        class="page-error materials-message"
+                        class="page-error materials-error"
                         role="alert"
                     ></p>
 
@@ -384,20 +341,24 @@
 
                 </form>
 
-            </article>
+            </div>
 
 
-            <article class="materials-card materials-list-card">
+            <div class="materials-list-card">
 
-                <div class="materials-heading">
+                <div class="materials-section-heading">
 
-                    <h2>
-                        Материалы курса
-                    </h2>
+                    <div>
 
-                    <p>
-                        Документы, добавленные в этот курс.
-                    </p>
+                        <h2>
+                            Материалы курса
+                        </h2>
+
+                        <p>
+                            Документы, добавленные в этот курс.
+                        </p>
+
+                    </div>
 
                 </div>
 
@@ -406,11 +367,7 @@
                     id="materials-loading"
                     class="materials-state"
                 >
-                    <div class="materials-loader"></div>
-
-                    <span>
-                        Загружаем материалы...
-                    </span>
+                    Загрузка материалов...
                 </div>
 
 
@@ -433,11 +390,9 @@
                         ></path>
                     </svg>
 
-
                     <strong>
                         Материалов пока нет
                     </strong>
-
 
                     <span>
                         Загруженные документы появятся здесь.
@@ -465,11 +420,9 @@
                         ></path>
                     </svg>
 
-
                     <strong>
                         Материалы скоро будут доступны
                     </strong>
-
 
                     <span>
                         Backend API документов пока не подключён.
@@ -480,7 +433,7 @@
 
                 <div
                     id="materials-error"
-                    class="materials-state materials-state-error"
+                    class="materials-state materials-error-state"
                     hidden
                 ></div>
 
@@ -491,7 +444,7 @@
                     hidden
                 ></div>
 
-            </article>
+            </div>
 
         </section>
 

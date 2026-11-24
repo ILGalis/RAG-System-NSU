@@ -16,10 +16,14 @@ const ALLOWED_DOCUMENT_EXTENSIONS = [
 ];
 
 
+const MAX_DOCUMENT_SIZE =
+    20 * 1024 * 1024;
+
+
 let selectedDocument = null;
 
 
-/* Курс */
+/* Данные страницы */
 
 function getMaterialsSpaceId() {
     const params =
@@ -55,6 +59,45 @@ function getMaterialsCurrentUserId() {
 }
 
 
+/* Авторизация */
+
+function clearMaterialsAuthData() {
+    localStorage.removeItem(
+        "access_token"
+    );
+
+    localStorage.removeItem(
+        "token_type"
+    );
+
+    localStorage.removeItem(
+        "user_id"
+    );
+
+    localStorage.removeItem(
+        "user_role"
+    );
+
+    localStorage.removeItem(
+        "user_email"
+    );
+
+    localStorage.removeItem(
+        "user_first_name"
+    );
+
+    localStorage.removeItem(
+        "user_last_name"
+    );
+}
+
+
+function redirectMaterialsToLogin() {
+    window.location.href =
+        "../login.html";
+}
+
+
 /* Ответ API */
 
 async function readMaterialsResponse(
@@ -63,6 +106,7 @@ async function readMaterialsResponse(
     if (response.status === 204) {
         return {};
     }
+
 
     try {
         return await response.json();
@@ -187,6 +231,19 @@ function validateDocument(file) {
             )
     ) {
         return "Поддерживаются только файлы PDF, DOCX и TXT.";
+    }
+
+
+    if (
+        file.size >
+        MAX_DOCUMENT_SIZE
+    ) {
+        return "Максимальный размер файла — 20 МБ.";
+    }
+
+
+    if (file.size === 0) {
+        return "Файл пустой.";
     }
 
 
@@ -373,7 +430,7 @@ function setUploadLoading(
 }
 
 
-/* Ответ списка документов */
+/* Данные документов */
 
 function getDocumentsFromResponse(
     data
@@ -418,6 +475,7 @@ function getDocumentName(
     documentItem
 ) {
     return (
+        documentItem.source_name ||
         documentItem.filename ||
         documentItem.file_name ||
         documentItem.original_name ||
@@ -431,8 +489,8 @@ function getDocumentSize(
     documentItem
 ) {
     return (
-        documentItem.size_bytes ??
         documentItem.file_size ??
+        documentItem.size_bytes ??
         documentItem.size ??
         null
     );
@@ -463,8 +521,10 @@ function getDocumentStatusLabel(
             return "Готов";
 
         case "processing":
-        case "pending":
             return "Обработка";
+
+        case "pending":
+            return "В очереди";
 
         case "failed":
         case "error":
@@ -677,8 +737,7 @@ function showMaterialsState(
 
     if (unavailable) {
         unavailable.hidden =
-            state !==
-            "unavailable";
+            true;
     }
 
 
@@ -767,10 +826,7 @@ async function loadDocuments() {
 
 
     if (!token) {
-        showMaterialsState(
-            "error",
-            "Для просмотра материалов необходимо войти в систему."
-        );
+        redirectMaterialsToLogin();
 
         return;
     }
@@ -796,34 +852,13 @@ async function loadDocuments() {
             );
 
 
-        /*
-         * Пока document API
-         * не реализован, не трогаем
-         * авторизацию пользователя.
-         */
         if (
-            response.status === 404 ||
-            response.status === 405
+            response.status ===
+            401
         ) {
-            showMaterialsState(
-                "unavailable"
-            );
+            clearMaterialsAuthData();
 
-            return;
-        }
-
-
-        /*
-         * Также не очищаем localStorage
-         * при 401 от недоделанной
-         * document-ручки.
-         */
-        if (
-            response.status === 401
-        ) {
-            showMaterialsState(
-                "unavailable"
-            );
+            redirectMaterialsToLogin();
 
             return;
         }
@@ -886,9 +921,7 @@ async function uploadDocument() {
 
 
     if (!token) {
-        showUploadError(
-            "Для загрузки документа необходимо войти в систему."
-        );
+        redirectMaterialsToLogin();
 
         return;
     }
@@ -913,11 +946,6 @@ async function uploadDocument() {
         new FormData();
 
 
-    /*
-     * Ожидаемый backend-контракт:
-     * multipart/form-data
-     * поле файла: file
-     */
     formData.append(
         "file",
         selectedDocument
@@ -936,7 +964,8 @@ async function uploadDocument() {
                     spaceId
                 ),
                 {
-                    method: "POST",
+                    method:
+                        "POST",
 
                     headers: {
                         "Authorization":
@@ -949,22 +978,13 @@ async function uploadDocument() {
             );
 
 
-        /*
-         * Backend API документов
-         * пока не реализован.
-         *
-         * Не удаляем авторизацию
-         * пользователя при ошибках
-         * этой ручки.
-         */
         if (
-            response.status === 404 ||
-            response.status === 405 ||
-            response.status === 401
+            response.status ===
+            401
         ) {
-            showUploadError(
-                "API загрузки документов пока не подключён на backend."
-            );
+            clearMaterialsAuthData();
+
+            redirectMaterialsToLogin();
 
             return;
         }
@@ -1015,7 +1035,6 @@ function configureUploadAccess(
         document.getElementById(
             "materials-upload-card"
         );
-
 
     const currentUserId =
         getMaterialsCurrentUserId();
