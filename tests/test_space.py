@@ -1,10 +1,5 @@
-import pytest
 from fastapi.testclient import TestClient
-from sqlalchemy import select, text
 
-from app.main import app
-from backend.db.connection import SessionLocal, engine
-from backend.models import User
 
 def test_create_space_uses_current_user(client: TestClient, make_user):
     u = make_user()

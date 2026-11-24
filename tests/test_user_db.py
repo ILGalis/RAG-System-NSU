@@ -2,8 +2,8 @@ import pytest
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 
-from tests.conftest import TestingSessionLocal
 from backend.models import User
+from tests.conftest import TestingSessionLocal
 
 
 def test_user_creation_and_unique_email():

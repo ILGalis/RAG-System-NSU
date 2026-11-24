@@ -6,7 +6,6 @@ import pytest
 from app.rag.parsers.base import ParsedDocument
 from app.rag.parsers.txt import TXTParser
 
-
 FIXTURES_DIR = Path(__file__).parent / "fixtures"
 TEST_TXT = FIXTURES_DIR / "nsu_rag_parser_test.txt"
 

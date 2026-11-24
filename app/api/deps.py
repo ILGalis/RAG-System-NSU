@@ -1,6 +1,6 @@
 import hashlib
 from collections.abc import Callable, Generator
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from fastapi import Depends, Header
 from sqlalchemy import select
@@ -12,7 +12,7 @@ from backend.models import RagSpace, SpaceMember, User
 from backend.models.session import Session as UserSession
 
 
-def get_db() -> Generator[Session, None, None]:
+def get_db() -> Generator[Session]:
     db = SessionLocal()
     try:
         yield db
@@ -36,7 +36,7 @@ def get_current_user(
         select(UserSession).where(UserSession.token_hash == _hash_token(raw_token))
     )
 
-    if session is None or session.expires_at < datetime.now(timezone.utc):
+    if session is None or session.expires_at < datetime.now(UTC):
         raise AppError(401, "invalid_session", "Сессия недействительна или истекла")
 
     user = db.get(User, session.user_id)
@@ -104,3 +104,9 @@ def require_space_owner(space: RagSpace, user: User) -> None:
             "not_owner",
             "Только владелец может изменять пространство",
         )
+
+def require_space_member(db: Session, space: RagSpace, user: User) -> None:
+    """Пускает только владельца или участника (без учета public-доступа)."""
+    if space.owner_id == user.id or _is_space_member(db, space.id, user.id):
+        return
+    raise AppError(403, "access_denied", "Нет доступа к пространству")

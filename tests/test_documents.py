@@ -1,10 +1,12 @@
 from pathlib import Path
+from urllib.parse import quote, unquote
+
 import pytest
 from sqlalchemy import select
+
 import app.api.routes.document as doc_routes
 from backend.models import Document
 from tests.conftest import TestingSessionLocal
-from urllib.parse import quote, unquote
 
 PDF_BYTES = b"%PDF-1.4\nfake\n"
 TXT_BYTES = b"hello\n"

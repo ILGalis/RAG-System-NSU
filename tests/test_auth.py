@@ -1,11 +1,11 @@
 import hashlib
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import select
 
-from backend.models import User, RagSpace
+from backend.models import RagSpace, User
 from backend.models.email_token import EmailVerificationToken
 from tests.conftest import TestingSessionLocal
 
@@ -126,7 +126,7 @@ def test_verify_flow(client: TestClient):
             EmailVerificationToken(
                 user_id=user.id,
                 token_hash=_sha(raw),
-                expires_at=datetime.now(timezone.utc) + timedelta(hours=1),
+                expires_at=datetime.now(UTC) + timedelta(hours=1),
             )
         )
         db.commit()

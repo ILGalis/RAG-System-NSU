@@ -1,16 +1,16 @@
 from datetime import datetime
 
 from sqlalchemy import (
+    Boolean,
+    CheckConstraint,
     DateTime,
     String,
     func,
-    Boolean ,
-    CheckConstraint,
 )
 from sqlalchemy.orm import Mapped, mapped_column
 
-
 from backend.db.base import Base
+
 
 class User(Base):
     __tablename__="users"

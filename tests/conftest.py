@@ -8,8 +8,8 @@ from sqlalchemy.orm import sessionmaker
 
 load_dotenv()
 
-from app.main import app
 from app.api.deps import get_db
+from app.main import app
 from backend.models import User
 
 TEST_DATABASE_URL = os.environ["TEST_DATABASE_URL"]
@@ -33,8 +33,9 @@ def _override_get_db():
 @pytest.fixture(scope="session", autouse=True)
 def _apply_migrations():
     """Накатываем миграции на тестовую БД один раз за сессию."""
-    from alembic import command
     from alembic.config import Config
+
+    from alembic import command
 
     old = os.environ.get("DATABASE_URL")
     os.environ["DATABASE_URL"] = TEST_DATABASE_URL

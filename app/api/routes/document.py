@@ -1,5 +1,6 @@
 from pathlib import Path
 from uuid import uuid4
+
 #ЭТУ ручку проверить прям надо, я честно не понял как её реализовать нормально
 # пока придумал только вынести в разные ручки мб чето
 from fastapi import (
@@ -12,8 +13,6 @@ from fastapi import (
 )
 from sqlalchemy import select
 from sqlalchemy.orm import Session
-from app.core.ids import document_id_str, space_id_str
-from app.services.qdrant_cleanup import delete_document_points
 
 from app.api.deps import (
     get_current_user,
@@ -23,7 +22,9 @@ from app.api.deps import (
     require_space_owner,
 )
 from app.core.error import AppError
+from app.core.ids import document_id_str, space_id_str
 from app.services.ingest import ingest_document
+from app.services.qdrant_cleanup import delete_document_points
 from backend.models import Document, User
 from backend.schemas.document import DocumentResponse
 

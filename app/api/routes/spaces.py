@@ -1,10 +1,10 @@
-from fastapi import APIRouter, Depends, status
-from sqlalchemy.orm import Session
-from app.core.error import AppError
 import shutil
 from pathlib import Path
+
+from fastapi import APIRouter, Depends, status
 from sqlalchemy import select
-from backend.models import Document
+from sqlalchemy.orm import Session
+
 from app.api.deps import (
     get_current_user,
     get_db,
@@ -12,15 +12,17 @@ from app.api.deps import (
     require_space_access,
     require_space_owner,
 )
+from app.core.error import AppError
+from app.core.ids import space_id_str
 from app.crud import space as space_crud
-from backend.models import User
+from app.services.qdrant_cleanup import delete_space_points
+from backend.models import Document, User
 from backend.schemas.space import (
     RagSpaceCreate,
     RagSpaceResponse,
     RagSpaceUpdate,
 )
-from app.core.ids import space_id_str
-from app.services.qdrant_cleanup import delete_space_points
+
 router = APIRouter(prefix="/spaces", tags=["spaces"])
 
 

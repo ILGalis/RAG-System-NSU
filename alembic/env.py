@@ -9,16 +9,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from sqlalchemy import engine_from_config, pool
 
 from alembic import context
-
 from backend.core.config import settings
 from backend.db.base import Base
-from backend.models import (
-    EmailVerificationToken,
-    RagSpace,
-    SpaceMember,
-    User,
-    UserSession,
-)
 
 config = context.config
 

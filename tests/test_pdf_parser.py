@@ -6,7 +6,6 @@ import pytest
 from app.rag.parsers.base import ParsedDocument
 from app.rag.parsers.pdf import PDFParser
 
-
 FIXTURES_DIR = Path(__file__).parent / "fixtures"
 TEST_PDF = FIXTURES_DIR / "nsu_rag_parser_test.pdf"
 
@@ -45,7 +44,6 @@ def test_pdf_parser_rejects_non_pdf_file(tmp_path):
 
 
 import pymupdf
-
 
 
 def test_pdf_preserves_russian_text_and_page_structure(tmp_path):

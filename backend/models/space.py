@@ -8,9 +8,11 @@ from sqlalchemy import (
     UniqueConstraint,
     func,
 )
-from sqlalchemy.orm import  Mapped, mapped_column, relationship
-from backend.models.user import User
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
 from backend.db.base import Base
+from backend.models.user import User
+
 
 class RagSpace(Base):
     __tablename__ = "rag_spaces"
