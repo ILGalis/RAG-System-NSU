@@ -1,5 +1,5 @@
-from tests.conftest import TestingSessionLocal
 from backend.models import SpaceMember
+from tests.conftest import TestingSessionLocal
 
 
 def test_list_members(client, make_user):

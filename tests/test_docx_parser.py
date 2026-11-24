@@ -6,7 +6,6 @@ import pytest
 from app.rag.parsers.base import ParsedDocument
 from app.rag.parsers.docx import DOCXParser
 
-
 FIXTURES_DIR = Path(__file__).parent / "fixtures"
 TEST_DOCX = FIXTURES_DIR / "nsu_rag_parser_test.docx"
 

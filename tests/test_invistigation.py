@@ -1,7 +1,11 @@
-from datetime import datetime, timezone, timedelta
+from datetime import UTC, datetime, timedelta
+
 from sqlalchemy import select
+
 from backend.models import Invitation
 from tests.conftest import TestingSessionLocal
+
+
 #НЕКОТОРЫЕ ТЕСТЫ ДУБЛИРУЮТСЯ В test_member , Я КОЕ ЧТО ПРОВЕРИЛ,КОГДА СДЕЛАЮ CI УБЕРУ 
 def test_invitation_flow(client, make_user):
     owner = make_user("o@g.nsu.ru")
@@ -16,7 +20,7 @@ def test_invitation_flow(client, make_user):
     r = client.post(f"/spaces/{sid}/invitations", headers=owner["headers"], json={})
     assert r.status_code == 201
     code = r.json()["code"]
-    inv_id = r.json()["id"]
+    #inv_id = r.json()["id"]
 
     # 2. Студент принимает
     r = client.post("/invitations/accept", headers=student["headers"], json={"code": code})
@@ -42,7 +46,7 @@ def test_invitation_expired(client, make_user):
     # Искусственно сдвигаем время в БД
     with TestingSessionLocal() as db:
         inv = db.scalar(select(Invitation))
-        inv.expires_at = datetime.now(timezone.utc) - timedelta(days=1)
+        inv.expires_at = datetime.now(UTC) - timedelta(days=1)
         db.commit()
 
     r = client.post("/invitations/accept", headers=student["headers"], json={"code": code})
@@ -74,6 +78,7 @@ def test_non_owner_cannot_manage_invites(client, make_user):
     assert r.status_code == 403
 
 import concurrent.futures
+
 
 def test_concurrent_invitation_accept(client, make_user):
     owner = make_user("o@g.nsu.ru")
@@ -114,7 +119,6 @@ def test_duplicate_membership_with_another_code(client, make_user):
     assert r.status_code == 409
     assert r.json()["error"]["code"] == "already_member"
 
-import concurrent.futures
 
 def test_concurrent_accept_and_revoke(client, make_user):
     owner = make_user("o@g.nsu.ru")

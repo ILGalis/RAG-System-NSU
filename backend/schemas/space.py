@@ -2,7 +2,8 @@
 from datetime import datetime
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict,EmailStr, Field
+from pydantic import BaseModel, ConfigDict, EmailStr, Field
+
 
 class SpaceOwnerOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)

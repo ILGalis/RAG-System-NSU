@@ -1,9 +1,8 @@
 from fastapi import FastAPI
 from sqlalchemy import text
 
-from app.api.routes import auth, spaces,document,members,invitations
+from app.api.routes import auth, document, invitations, members, spaces
 from app.core.error import register_error_handlers
-
 from backend.db.connection import engine
 
 app = FastAPI(

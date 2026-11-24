@@ -2,27 +2,29 @@ import hashlib
 import logging
 import re
 import secrets
-from datetime import datetime, timedelta, timezone
 import shutil
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
+
 from fastapi import APIRouter, Depends, status
 from sqlalchemy import select
 from sqlalchemy.orm import Session
-from app.core.ids import document_id_str, space_id_str
-from app.services.qdrant_cleanup import delete_document_points, delete_space_points
+
 from app.api.deps import get_current_user, get_db
 from app.core.error import AppError
-from backend.core.security import hash_password, verify_password
+from app.core.ids import document_id_str, space_id_str
+from app.services.qdrant_cleanup import delete_document_points, delete_space_points
 from backend.core.roles import resolve_role
-from backend.models import User, Document,RagSpace
+from backend.core.security import hash_password, verify_password
+from backend.models import Document, RagSpace, User
 from backend.models.email_token import EmailVerificationToken
 from backend.models.session import Session as UserSession
 from backend.schemas.auth import (
+    DeleteAccountRequest,
     LoginRequest,
     RegisterRequest,
     UserOut,
     VerifyEmailRequest,
-    DeleteAccountRequest,
 )
 
 logger = logging.getLogger(__name__)
@@ -73,7 +75,7 @@ def register(data: RegisterRequest, db: Session = Depends(get_db)) -> dict:
         EmailVerificationToken(
             user_id=user.id,
             token_hash=_hash_token(raw_token),
-            expires_at=datetime.now(timezone.utc) + TOKEN_TTL,
+            expires_at=datetime.now(UTC) + TOKEN_TTL,
         )
     )
     db.commit()
@@ -83,8 +85,6 @@ def register(data: RegisterRequest, db: Session = Depends(get_db)) -> dict:
     # бот лежит в backend/core/email_verificator_bot.py
     logger.info("[EMAIL VERIFICATION] %s: token=%s", email, raw_token)
     print(f"[EMAIL VERIFICATION] {email}: code={raw_token}")
-    #
-    #
     return {
         "status": "pending_verification",
         "message": "Проверьте почту",
@@ -102,7 +102,7 @@ def verify_email(
             EmailVerificationToken.token_hash == token_hash
         )
     )
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
 
     if record is None or record.used_at is not None or record.expires_at < now:
         raise AppError(400, "invalid_token", "Токен недействителен или истёк")
@@ -138,7 +138,7 @@ def login(data: LoginRequest, db: Session = Depends(get_db)) -> dict:
         UserSession(
             user_id=user.id,
             token_hash=_hash_token(raw_token),
-            expires_at=datetime.now(timezone.utc) + SESSION_TTL,
+            expires_at=datetime.now(UTC) + SESSION_TTL,
         )
     )
     db.commit()

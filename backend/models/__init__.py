@@ -1,15 +1,16 @@
+from backend.models.document import Document
 from backend.models.email_token import EmailVerificationToken
+from backend.models.invitation import Invitation
 from backend.models.session import UserSession
 from backend.models.space import RagSpace, SpaceMember
 from backend.models.user import User
-from backend.models.document import Document
-from backend.models.invitation import Invitation
+
 __all__ = [
-    "User",
+    "Document",
+    "EmailVerificationToken",
+    "Invitation",
     "RagSpace",
     "SpaceMember",
+    "User",
     "UserSession",
-    "EmailVerificationToken",
-    "Document",
-    "Invitation",
 ]

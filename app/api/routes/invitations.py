@@ -1,8 +1,8 @@
 import hashlib
 import secrets
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -10,8 +10,10 @@ from app.api.deps import get_current_user, get_db, get_space_or_404, require_spa
 from app.core.error import AppError
 from backend.models import Invitation, SpaceMember, User
 from backend.schemas.invitation import (
-    AcceptInvitationRequest, InvitationCreate,
-    InvitationCreatedResponse, InvitationResponse,
+    AcceptInvitationRequest,
+    InvitationCreate,
+    InvitationCreatedResponse,
+    InvitationResponse,
 )
 
 router = APIRouter(tags=["invitations"])
@@ -44,7 +46,7 @@ def create_invitation(
         space_id=space_id,
         created_by=current_user.id,
         code_hash=_hash_code(raw_code),
-        expires_at=datetime.now(timezone.utc) + timedelta(hours=data.ttl_hours),
+        expires_at=datetime.now(UTC) + timedelta(hours=data.ttl_hours),
     )
     db.add(inv)
     db.commit()
@@ -67,7 +69,7 @@ def list_invitations(
     require_space_owner(space, current_user)
 
     invs = db.scalars(select(Invitation).where(Invitation.space_id == space_id)).all()
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
 
     
     return [
@@ -97,7 +99,7 @@ def revoke_invitation(
     if inv.used_at or inv.revoked_at:
         return  # уже использовано или отозвано, ничего не делаем
 
-    inv.revoked_at = datetime.now(timezone.utc)
+    inv.revoked_at = datetime.now(UTC)
     db.commit()
 
 
@@ -111,7 +113,7 @@ def accept_invitation(
         select(Invitation).where(Invitation.code_hash == _hash_code(data.code)).with_for_update()
     )
     
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     if not inv or invitation_status(inv, now) != "active":
         raise AppError(400, "invalid_invitation", "Код недействителен, истёк или отозван")
 

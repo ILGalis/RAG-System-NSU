@@ -1,16 +1,19 @@
+from datetime import datetime
+
 from fastapi import APIRouter, Depends, status
+from pydantic import BaseModel
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.api.deps import (
-    get_current_user, get_db, get_space_or_404,
-    require_space_member, require_space_owner,
+    get_current_user,
+    get_db,
+    get_space_or_404,
+    require_space_member,
+    require_space_owner,
 )
 from app.core.error import AppError
 from backend.models import SpaceMember, User
-from backend.schemas.auth import UserOut
-from pydantic import BaseModel
-from datetime import datetime
 
 router = APIRouter(tags=["members"])
 

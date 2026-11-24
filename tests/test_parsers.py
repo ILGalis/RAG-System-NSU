@@ -2,10 +2,9 @@
 from pathlib import Path
 
 from app.rag.parsers.base import ParsedDocument
-from app.rag.parsers.pdf import PDFParser
 from app.rag.parsers.docx import DOCXParser
+from app.rag.parsers.pdf import PDFParser
 from app.rag.parsers.txt import TXTParser
-
 
 FIXTURES_DIR = Path(__file__).parent / "fixtures"
 

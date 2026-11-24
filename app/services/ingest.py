@@ -1,9 +1,10 @@
 import logging
 from pathlib import Path
+
+from app.core.ids import document_id_str, space_id_str
 from app.services.qdrant_cleanup import delete_document_points
 from backend.db.connection import SessionLocal
 from backend.models import Document
-from app.core.ids import document_id_str, space_id_str
 
 logger = logging.getLogger(__name__)
 """
