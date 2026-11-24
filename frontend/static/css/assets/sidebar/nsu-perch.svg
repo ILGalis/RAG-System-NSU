@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='utf-8'?>
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="72" viewBox="0 0 360 72" color="#ffffff" fill="currentColor">
+  <title>Двухступенчатая линия с листьями</title>
+  <desc>Два подъёма слева направо. Ступени 12 на 12 единиц. Линия отсутствует между x=151 и x=236 на среднем уровне y=42. Белые элементы на прозрачном фоне; ровно два отдельных листа без стебельков слева.</desc>
+  <!-- Левая часть: первая ступень, затем участок до совы. -->
+  <path id="perch-left" d="M0 54H74L86 42H151" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="butt" stroke-linejoin="miter"/>
+  <!-- Правая часть: после разрыва, вторая ступень и продолжение вправо. -->
+  <path id="perch-right" d="M236 42H278L290 30H360" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="butt" stroke-linejoin="miter"/>
+  <!-- Два отдельных листа без стебельков, как на референсе. -->
+  <path id="leaf-left" d="M65 42C52 45 39 37 33 26C46 18 64 24 67 35C68 38 67 40 65 42Z"/>
+  <path id="leaf-right" d="M75 36C68 29 73 20 81 15C85 24 84 34 75 36Z"/>
+</svg>

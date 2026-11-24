@@ -19,4 +19,18 @@
     --radius-sm: 6px;
     --radius-md: 10px;
     --radius-lg: 22px;
+
+
+    /* Боковая панель */
+
+    --color-sidebar-background: #4f9633;
+    --color-sidebar-pattern: #2f6c1d;
+    --color-sidebar-text: #ffffff;
+    --color-sidebar-decoration: #ffffff;
+
+    --color-sidebar-active-background: #f6fbf2;
+    --color-sidebar-active-text: #3d812a;
+
+    --sidebar-pattern-opacity: 0.16;
+    --sidebar-pattern-size: 100%;
 }
