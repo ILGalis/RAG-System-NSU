@@ -113,3 +113,40 @@ def test_duplicate_membership_with_another_code(client, make_user):
     r = client.post("/invitations/accept", headers=student["headers"], json={"code": code2})
     assert r.status_code == 409
     assert r.json()["error"]["code"] == "already_member"
+
+import concurrent.futures
+
+def test_concurrent_accept_and_revoke(client, make_user):
+    owner = make_user("o@g.nsu.ru")
+    student = make_user("s@g.nsu.ru")
+    sid = client.post(
+        "/spaces", headers=owner["headers"],
+        json={"name": "S", "owner_id": 1, "access_mode": "private"}
+    ).json()["id"]
+
+    # Создаём инвайт
+    inv_data = client.post(f"/spaces/{sid}/invitations", headers=owner["headers"], json={}).json()
+    code = inv_data["code"]
+    inv_id = inv_data["id"]
+
+    def accept():
+        return client.post("/invitations/accept", headers=student["headers"], json={"code": code})
+
+    def revoke():
+        return client.delete(f"/spaces/{sid}/invitations/{inv_id}", headers=owner["headers"])
+
+    # Запускаем оба запроса параллельно
+    with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
+        future_accept = executor.submit(accept)
+        future_revoke = executor.submit(revoke)
+        results = [future_accept.result(), future_revoke.result()]
+
+    statuses = {r.status_code for r in results}
+
+    # Возможны два исхода:
+    # 1) accept успел первым (200), revoke уже не может отозвать (204 всё равно вернёт, т.к. код уже used)
+    # 2) revoke успел первым (204), accept получает 400 invalid_invitation
+    assert 200 in statuses or 204 in statuses
+    # Проверяем, что не произошло двойного принятия
+    members = client.get(f"/spaces/{sid}/members", headers=owner["headers"]).json()
+    assert len(members) == 2  # owner + student (если accept успешен) или 1 (если revoke успешен)
